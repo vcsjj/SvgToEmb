@@ -19,7 +19,7 @@ namespace ShapeLib
             var l = new List<Step>();
             var firstVertex = this.p.GetTopLeft();
             var bb = this.p.GetBoundingBox();
-            l.Add(new Step(Step.StepType.Jump, firstVertex));
+            l.Add(new Step(Step.StepType.Trim, firstVertex));
 
             for (double y = bb.Top-lineHeight; y > bb.Bottom; y -= lineHeight)
             {

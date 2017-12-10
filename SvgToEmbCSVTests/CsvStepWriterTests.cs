@@ -42,6 +42,33 @@ namespace SvgToEmbCSVTests
             }
         }
 
+        [Test()]
+        public void XandYHaveTwoDigits()
+        {
+            var step = this.CreateStitchStep();
+            CsvStepWriter w = new CsvStepWriter(step);
+            string line = w.Write();
+            string[] parts = line.Split(',');
+            Assert.AreEqual("1.00", parts[2].Replace("\"", string.Empty));
+            Assert.AreEqual("2.00", parts[3].Replace("\"", string.Empty));
+        }
+
+        [Test()]
+        public void XandYHaveTwoDigits2()
+        {
+            var step = this.CreateOtherStitchStep();
+            CsvStepWriter w = new CsvStepWriter(step);
+            string line = w.Write();
+            string[] parts = line.Split(',');
+            Assert.AreEqual("-4.57", parts[2].Replace("\"", string.Empty));
+            Assert.AreEqual("33.10", parts[3].Replace("\"", string.Empty));
+        }
+
+        private Step CreateOtherStitchStep() 
+        {
+            return new Step(Step.StepType.Stitch, new MyPoint(-4.567, 33.1));
+        }
+
         private Step CreateStitchStep() 
         {
             return new Step(Step.StepType.Stitch, new MyPoint(1, 2));

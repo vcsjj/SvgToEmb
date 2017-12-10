@@ -27,7 +27,7 @@ namespace ShapeLib
         public enum StepType 
         {
             Stitch,
-            Jump
+            Trim
         }
 
         public Step(StepType type, MyPoint p)
