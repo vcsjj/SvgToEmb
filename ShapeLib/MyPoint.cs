@@ -4,20 +4,39 @@ namespace ShapeLib
 {
 	public class MyPoint
 	{
+        public double XOriginal
+        {
+            get;
+        }
+
+        public double YOriginal
+        {
+            get;
+        }
+
 		public double Y {
-			get;
-			set;
+            get { return this.TransformY();}
 		}
 
 		public double X {
-			get;
-			set;
+            get { return this.TransformX(); }
 		}
 
-		public MyPoint (double x, double y)
+        private readonly double[] transformation;
+
+        public MyPoint (double x, double y, double[] transformation = null)
 		{
-			this.X = x;
-			this.Y = y;
+			this.XOriginal = x;
+			this.YOriginal = y;
+
+            if (transformation == null || transformation.Length != 6)
+            {
+                this.transformation = new double[] { 1, 0, 0, 1, 0, 0 };
+            }
+            else
+            {
+                this.transformation = transformation;
+            }
 		}
 
 		public double Distance (MyPoint p2)
@@ -32,6 +51,40 @@ namespace ShapeLib
             var newY = -this.X * Math.Sin(rad) + this.Y * Math.Cos(rad);
 
             return new MyPoint(newx, newY);
+        }
+
+        private double TransformX()
+        {
+            double xo, yo;
+            Transform(this.XOriginal, this.YOriginal, 
+                this.transformation[0], 
+                this.transformation[1],
+                this.transformation[2],
+                this.transformation[3],
+                this.transformation[4],
+                this.transformation[5], 
+                out xo, out yo);
+            return xo;
+        }
+
+        private double TransformY()
+        {
+            double xo, yo;
+            Transform(this.XOriginal, this.YOriginal, 
+                this.transformation[0], 
+                this.transformation[1],
+                this.transformation[2],
+                this.transformation[3],
+                this.transformation[4],
+                this.transformation[5], 
+                out xo, out yo);
+            return yo;
+        }
+
+        private static void Transform(double x, double y, double a, double b, double c, double d, double e, double f, out double xo, out double yo) 
+        {
+            xo = x*a + y*c + e;
+            yo = x*b + y*d + f;
         }
 	}
 }
