@@ -5,6 +5,13 @@ namespace ShapeLib
 {
     public class TransformationParser
     {
+        private static System.Globalization.CultureInfo culture = System.Globalization.CultureInfo.InvariantCulture;
+        private static  System.Globalization.NumberStyles numberStyle = System.Globalization.NumberStyles.Any;
+
+        Regex singleNumberExpression = new Regex("([0-9.e\\-]+)");
+        Regex twoNumbersExpression = new Regex("([0-9.e\\-]+), *([0-9.e\\-]+)");
+        Regex sevenNumbersExpression = new Regex("([0-9.e\\-]+), *([0-9.e\\-]+), *([0-9.e\\-]+), *([0-9.e\\-]+), *([0-9.e\\-]+), *([0-9.e\\-]+)");
+
         private readonly string transformationstring;
 
         public TransformationParser(string transform)
@@ -35,11 +42,8 @@ namespace ShapeLib
 
         double[,] ExtractRotation(string numbers)
         {
-            var culture = System.Globalization.CultureInfo.InvariantCulture;
-            var numberStyle = System.Globalization.NumberStyles.Any;
-            Regex r = new Regex("([0-9.e\\-]+)");
             double[,] m = GetUnitMatrix();
-            var match = r.Match(numbers);
+            var match = singleNumberExpression.Match(numbers);
             if (match.Groups.Count == 2)
             {
                 double alpha = 0.0;
@@ -57,11 +61,9 @@ namespace ShapeLib
 
         double[,] ExtractTranslation(string numbers)
         {
-            var culture = System.Globalization.CultureInfo.InvariantCulture;
-            var numberStyle = System.Globalization.NumberStyles.Any;
-            Regex r = new Regex("([0-9.e\\-]+), *([0-9.e\\-]+)");
+            
             double[,] m = GetUnitMatrix();
-            var match = r.Match(numbers);
+            var match = twoNumbersExpression.Match(numbers);
             if (match.Groups.Count == 3)
             {
                 double x = 0.0;
@@ -77,11 +79,9 @@ namespace ShapeLib
 
         double[,] ExtractMatrix(string numbers)
         {
-            var culture = System.Globalization.CultureInfo.InvariantCulture;
-            var numberStyle = System.Globalization.NumberStyles.Any;
-            Regex r = new Regex("([0-9.e\\-]+), *([0-9.e\\-]+), *([0-9.e\\-]+), *([0-9.e\\-]+), *([0-9.e\\-]+), *([0-9.e\\-]+)");
+            
             double[,] m = GetUnitMatrix();
-            var match = r.Match(numbers);
+            var match = sevenNumbersExpression.Match(numbers);
             if (match.Groups.Count == 7)
             {
                 double a, b, c, d, e, f;
@@ -104,9 +104,58 @@ namespace ShapeLib
             return m;
         }
 
+        double[,] ExtractScale(string numbers)
+        {
+            double[,] m = GetUnitMatrix();
+            var match = this.singleNumberExpression.Match(numbers);
+            if (match.Groups.Count == 2)
+            {
+                double s;
+                if (double.TryParse(match.Groups[1].Value, numberStyle, culture, out s))
+                {
+                    m[0, 0] = s;
+                    m[1, 1] = s;
+                }
+            }
+
+            return m;
+        }
+
+        double[,] ExtractSkewX(string numbers)
+        {
+            double[,] m = GetUnitMatrix();
+            var match = this.singleNumberExpression.Match(numbers);
+            if (match.Groups.Count == 2)
+            {
+                double s;
+                if (double.TryParse(match.Groups[1].Value, numberStyle, culture, out s))
+                {
+                    m[1, 0] = Math.Tan(Math.PI * s/ 180.0);
+                }
+            }
+
+            return m;
+        }
+
+        double[,] ExtractSkewY(string numbers)
+        {
+            double[,] m = GetUnitMatrix();
+            var match = this.singleNumberExpression.Match(numbers);
+            if (match.Groups.Count == 2)
+            {
+                double s;
+                if (double.TryParse(match.Groups[1].Value, numberStyle, culture, out s))
+                {
+                    m[0, 1] = Math.Tan(Math.PI * s/ 180.0);
+                }
+            }
+
+            return m;
+        }
+
         public double[] GetTransformation() 
         {
-            Regex transformationsRegex = new Regex("(translate|rotate|matrix|scale|skew)\\((.*?)\\)");
+            Regex transformationsRegex = new Regex("(translate|rotate|matrix|scale|skewX|skewY)\\((.*?)\\)");
             var mc = transformationsRegex.Matches(this.transformationstring);
             var m0 = GetUnitMatrix();
 
@@ -123,6 +172,15 @@ namespace ShapeLib
                         break;
                     case "rotate":
                         m = ExtractRotation(numbers);
+                        break;
+                    case "scale":
+                        m = ExtractScale(numbers);
+                        break;
+                    case "skewX":
+                        m = ExtractSkewX(numbers);
+                        break;
+                    case "skewY":
+                        m = ExtractSkewY(numbers);
                         break;
                     default:
                         m = GetUnitMatrix();

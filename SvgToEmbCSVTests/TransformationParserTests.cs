@@ -94,6 +94,50 @@ namespace SvgToEmbCSVTests
             Assert.AreEqual(1, Math.Round(p.X, 8));
             Assert.AreEqual(0, Math.Round(p.Y, 8));
         }
+
+        [Test()]
+        public void Scale1()
+        {
+            TransformationParser tp = new TransformationParser("scale(3)");
+            double[] tr = tp.GetTransformation();
+            var p = new MyPoint(1, -2, tr);
+
+            Assert.AreEqual(3, Math.Round(p.X, 8));
+            Assert.AreEqual(-6, Math.Round(p.Y, 8));
+        }
+
+        [Test()]
+        public void Scale2()
+        {
+            TransformationParser tp = new TransformationParser("scale(0.2)");
+            double[] tr = tp.GetTransformation();
+            var p = new MyPoint(-5, 10, tr);
+
+            Assert.AreEqual(-1, Math.Round(p.X, 8));
+            Assert.AreEqual(2, Math.Round(p.Y, 8));
+        }
+
+        [Test()]
+        public void SkewX()
+        {
+            TransformationParser tp = new TransformationParser("skewX(30)");
+            double[] tr = tp.GetTransformation();
+            var p = new MyPoint(1, 1, tr);
+
+            Assert.AreEqual(Math.Round(1+1/Math.Sqrt(3.0), 8), Math.Round(p.X, 8));
+            Assert.AreEqual(1, Math.Round(p.Y, 8));
+        }
+
+        [Test()]
+        public void SkewY()
+        {
+            TransformationParser tp = new TransformationParser("skewY(-30)");
+            double[] tr = tp.GetTransformation();
+            var p = new MyPoint(1, 1, tr);
+
+            Assert.AreEqual(1, Math.Round(p.X, 8));
+            Assert.AreEqual(Math.Round(1 - 1/Math.Sqrt(3.0), 8), Math.Round(p.Y, 8));
+        }
     }
 }
 
