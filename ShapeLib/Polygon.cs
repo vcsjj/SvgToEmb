@@ -22,8 +22,14 @@ namespace ShapeLib
 			}
 		}
 
-		public Polygon(IEnumerable<MyPoint> points)
+        public bool IsTypeA
+        {
+            get;
+        }
+
+        public Polygon(IEnumerable<MyPoint> points, bool isTypeA = true)
 		{
+            this.IsTypeA = isTypeA;
 			foreach (var item in points) 
 			{
 				this.Vertices.Add (item);

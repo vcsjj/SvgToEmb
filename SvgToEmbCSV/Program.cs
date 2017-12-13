@@ -13,11 +13,15 @@ namespace SvgToEmbCSV
         {
             var culture = System.Globalization.CultureInfo.InvariantCulture;
             var numberStyle = System.Globalization.NumberStyles.Any;
-            var r = XElement.Load("/home/robert/penrose4.svg");
+            var r = XElement.Load("/home/robert/penrose3.svg");
+            List<Polygon> lp = new List<Polygon>();
+
             foreach (var l1 in r.Elements())
             {
                 string pointsString = l1.Attribute("points")?.Value;
                 string styleString = l1.Attribute("style")?.Value;
+                string transformationString = l1.Attribute("transform")?.Value;
+
                 bool isTypeA = false;
                 if (!string.IsNullOrEmpty(styleString))
                 {
@@ -25,6 +29,12 @@ namespace SvgToEmbCSV
                     {
                         isTypeA = true;
                     }
+                }
+
+                double[] transformation = new double[] { 1, 0, 0, 1, 0, 0 };
+                if (!string.IsNullOrEmpty(transformationString))
+                {
+                    transformation = new TransformationParser(transformationString).GetTransformation();
                 }
 
                 if (!string.IsNullOrEmpty(pointsString))
@@ -38,34 +48,40 @@ namespace SvgToEmbCSV
                         double y = 0.0;
                         if(double.TryParse(xy[0], numberStyle, culture, out x) && double.TryParse(xy[1],numberStyle, culture, out y) )
                         {
-                            l.Add(new MyPoint(x/2.0, y/2.0));
+                            l.Add(new MyPoint(x, y, transformation));
                         }
                     }
 
-                    var poly = new Polygon(l);
-                    IStepper s;
-                    if (isTypeA)
-                    {
-                        s = new HorizontalStepper(poly);
-                    }
-                    else
-                    {
-                        s = new VerticalStepper(poly);
-                    }
+                    lp.Add(new Polygon(l, isTypeA));
 
-                    var stepsOrig = s.CalculateSteps(2.5);//.Select(p => new MyPoint(p.X/10.0, p.Y/10.0));
-                    var avgx = 500;
-                    var avgy = 1400;
-                    var steps = stepsOrig.Select(p => new Step(p.Type, new MyPoint(p.Point.X - avgx, p.Point.Y-avgy)));
-
-                    foreach (var item in steps)
-                    {
-                        Console.WriteLine(new CsvStepWriter(item).Write());
-                    }
                 }
             }
 
+            foreach (var item in lp)
+            {
+                WritePolygonToCsV(item);
+            }
+
             Console.WriteLine(CsvStepWriter.WriteClosingSequence());
+        }
+
+        static void WritePolygonToCsV(Polygon poly)
+        {
+            IStepper s;
+            if (poly.IsTypeA)
+            {
+                s = new HorizontalStepper(poly);
+            }
+            else
+            {
+                s = new VerticalStepper(poly);
+            }
+            var stepsOrig = s.CalculateSteps(0.2);
+            var steps = stepsOrig.Select(p => new Step(p.Type, new MyPoint(p.Point.X, p.Point.Y)));
+            foreach (var item in steps)
+            {
+                Console.WriteLine(new CsvStepWriter(item).Write());
+            }
         }
     }
 }
