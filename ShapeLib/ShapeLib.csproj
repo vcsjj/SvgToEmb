@@ -41,6 +41,7 @@
     <Compile Include="IStepper.cs" />
     <Compile Include="Step.cs" />
     <Compile Include="TransformationParser.cs" />
+    <Compile Include="Fill.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

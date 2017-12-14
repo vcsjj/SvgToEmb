@@ -33,6 +33,9 @@
       <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Serialization" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="PointTests.cs" />
@@ -41,6 +44,8 @@
     <Compile Include="StepTests.cs" />
     <Compile Include="CsvStepWriterTests.cs" />
     <Compile Include="TransformationParserTests.cs" />
+    <Compile Include="CsvReaderTests.cs" />
+    <Compile Include="FillTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

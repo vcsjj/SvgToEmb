@@ -12,55 +12,16 @@ namespace SvgToEmbCSV
         public static void Main(string[] args)
         {
             var culture = System.Globalization.CultureInfo.InvariantCulture;
-            var numberStyle = System.Globalization.NumberStyles.Any;
             var r = XElement.Load("/home/robert/penrose3.svg");
-            List<Polygon> lp = new List<Polygon>();
-
-            foreach (var l1 in r.Elements())
+            var fillMap = new Dictionary<string, Fill>
             {
-                string pointsString = l1.Attribute("points")?.Value;
-                string styleString = l1.Attribute("style")?.Value;
-                string transformationString = l1.Attribute("transform")?.Value;
+                { "#aaaa00", new Fill(FillTypes.Vertical, 0.2) },
+                { "#aa0000", new Fill(FillTypes.Horizontal, 0.01) }
+            };
 
-                bool isTypeA = false;
-                if (!string.IsNullOrEmpty(styleString))
-                {
-                    if (styleString.Contains("fill:#aaaa00"))
-                    {
-                        isTypeA = true;
-                    }
-                }
-
-                double[] transformation = new double[] { 1, 0, 0, 1, 0, 0 };
-                if (!string.IsNullOrEmpty(transformationString))
-                {
-                    transformation = new TransformationParser(transformationString).GetTransformation();
-                }
-
-                if (!string.IsNullOrEmpty(pointsString))
-                {
-                    string[] positionList = pointsString.Split(' ');
-                    List<MyPoint> l = new List<MyPoint>();
-                    foreach (string position in positionList)
-                    {
-                        string[] xy = position.Split(',');
-                        double x = 0.0;
-                        double y = 0.0;
-                        if(double.TryParse(xy[0], numberStyle, culture, out x) && double.TryParse(xy[1],numberStyle, culture, out y) )
-                        {
-                            l.Add(new MyPoint(x, y, transformation));
-                        }
-                    }
-
-                    lp.Add(new Polygon(l, isTypeA));
-
-                }
-            }
-
-            foreach (var item in lp)
-            {
-                WritePolygonToCsV(item);
-            }
+            new CsvReader(r, fillMap)
+                .Read()
+                .ForEach(WritePolygonToCsV);
 
             Console.WriteLine(CsvStepWriter.WriteClosingSequence());
         }
@@ -68,15 +29,17 @@ namespace SvgToEmbCSV
         static void WritePolygonToCsV(Polygon poly)
         {
             IStepper s;
-            if (poly.IsTypeA)
-            {
-                s = new HorizontalStepper(poly);
+            switch(poly.Fill.FillType) {
+                case FillTypes.Vertical:
+                    s = new VerticalStepper(poly);
+                    break;
+                case FillTypes.Horizontal:
+                default:
+                    s = new HorizontalStepper(poly);
+                    break;
             }
-            else
-            {
-                s = new VerticalStepper(poly);
-            }
-            var stepsOrig = s.CalculateSteps(0.2);
+
+            var stepsOrig = s.CalculateSteps(poly.Fill.StitchWidth);
             var steps = stepsOrig.Select(p => new Step(p.Type, new MyPoint(p.Point.X, p.Point.Y)));
             foreach (var item in steps)
             {

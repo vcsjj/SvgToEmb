@@ -7,6 +7,11 @@ namespace ShapeLib
 {
 	public class Polygon
 	{
+        public Fill Fill
+        {
+            get;
+        }
+
 		private readonly List<MyPoint> vertices = new List<MyPoint>();
 
 		public List<MyPoint> Vertices {
@@ -20,16 +25,11 @@ namespace ShapeLib
 			for(int i = 0; i < vertices; i++) {
 				this.Vertices.Add(new MyPoint (0, 0));
 			}
-		}
+		} 
 
-        public bool IsTypeA
-        {
-            get;
-        }
-
-        public Polygon(IEnumerable<MyPoint> points, bool isTypeA = true)
+        public Polygon(IEnumerable<MyPoint> points, Fill fill = null)
 		{
-            this.IsTypeA = isTypeA;
+            this.Fill = fill;
 			foreach (var item in points) 
 			{
 				this.Vertices.Add (item);
