@@ -6,13 +6,13 @@ using System.Xml.Linq;
 
 namespace SvgToEmbCSV
 {
-    public class CsvReader
+    public class SvgReader
     {
         private readonly System.Xml.Linq.XElement source;
 
         private readonly Dictionary<string, Fill> fillMap;
 
-        public CsvReader(System.Xml.Linq.XElement xElement, Dictionary<string, Fill> fillmap = null)
+        public SvgReader(System.Xml.Linq.XElement xElement, Dictionary<string, Fill> fillmap = null)
         {
             this.source = xElement;
             this.fillMap = fillmap ?? new Dictionary<string, Fill>();
@@ -23,6 +23,36 @@ namespace SvgToEmbCSV
             var lp = this.ReadElements(this.source.Elements());
 
             return lp;
+        }
+
+        public List<string> Colors()
+        {
+            return this.ReadFillColors(this.source.Elements());
+        }
+
+        private List<string> ReadFillColors(IEnumerable<XElement> elements)
+        {
+            var lc = new List<string>();
+            foreach (XElement l1 in elements)
+            {
+                if (l1.Name.LocalName == "polygon")
+                {
+                    var p = ExtractFill(l1);
+                    if (p != null)
+                    {
+                        if (!lc.Contains(p))
+                        {
+                            lc.Add(p);
+                        }
+                    }
+                }
+                else
+                {
+                    lc.AddRange(this.ReadFillColors(l1.Elements()));
+                }
+            }
+
+            return lc;
         }
 
         List<Polygon> ReadElements(IEnumerable<XElement> elements)
@@ -46,6 +76,17 @@ namespace SvgToEmbCSV
             }
 
             return lp;
+        }
+
+        string ExtractFill(XElement l1)
+        {
+            string styleString = l1.Attribute("style")?.Value;
+            if (styleString != null)
+            {
+                return styleString.Split(';').Where(s => s.StartsWith("fill")).Select(s => s.Substring(5)).First();
+            }
+
+            return string.Empty;
         }
 
         Polygon ExtractPolygon(XElement l1)

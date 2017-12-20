@@ -44,8 +44,9 @@
     <Compile Include="StepTests.cs" />
     <Compile Include="CsvStepWriterTests.cs" />
     <Compile Include="TransformationParserTests.cs" />
-    <Compile Include="CsvReaderTests.cs" />
     <Compile Include="FillTests.cs" />
+    <Compile Include="OptionParserTests.cs" />
+    <Compile Include="SvgReaderTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

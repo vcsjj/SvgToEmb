@@ -8,12 +8,12 @@ using System.Collections.Generic;
 namespace SvgToEmbCSVTests
 {
     [TestFixture()]
-    public class CsvReaderTests
+    public class SvgReaderTests
     {
         [Test()]
         public void EmptyElementHasZeroPolygons()
         {
-            var reader = new CsvReader(new System.Xml.Linq.XElement("test"));
+            var reader = new SvgReader(new System.Xml.Linq.XElement("test"));
             List<Polygon> lp = reader.Read();
 
             Assert.AreEqual(0, lp.Count);
@@ -22,7 +22,7 @@ namespace SvgToEmbCSVTests
         [Test()]
         public void XmlWithOneElementHasOnePolygon()
         {
-            var reader = new CsvReader(System.Xml.Linq.XElement.Parse(
+            var reader = new SvgReader(System.Xml.Linq.XElement.Parse(
                                  "  <svg><polygon\n     points=\"1088.95,2511.82 1169.85,2570.6 1138.95,2475.49 1058.05,2416.71 \"  transform=\"matrix(0.05880683,0,0,0.0624649,-51.602926,-159.78388)\" /></svg>"
                              ));
 
@@ -34,7 +34,7 @@ namespace SvgToEmbCSVTests
         [Test()]
         public void XmlWithOneElementHasCorrectPolygon()
         {
-            var reader = new CsvReader(System.Xml.Linq.XElement.Parse(
+            var reader = new SvgReader(System.Xml.Linq.XElement.Parse(
                 "  <svg><polygon\n     points=\"1088.95,2511.82 1169.85,2570.6 1138.95,2475.49 1058.05,2416.71 \" /></svg>"
             ));
 
@@ -46,7 +46,7 @@ namespace SvgToEmbCSVTests
         [Test()]
         public void XmlWithTwoElementHasTwoPolygons()
         {
-            var reader = new CsvReader(System.Xml.Linq.XElement.Parse(
+            var reader = new SvgReader(System.Xml.Linq.XElement.Parse(
                 "<svg>"
                 + "<polygon\n     points=\"1,2 3,4 5,6 \"  />"
                 + "<polygon\n     points=\"1088.95,2511.82 1169.85,2570.6 1138.95,2475.49 1058.05,2416.71 \"/></svg>"
@@ -60,7 +60,7 @@ namespace SvgToEmbCSVTests
         [Test()]
         public void XmlWithTwoNestedElementsHasTwoPolygons()
         {
-            var reader = new CsvReader(System.Xml.Linq.XElement.Parse(
+            var reader = new SvgReader(System.Xml.Linq.XElement.Parse(
                 "<svg>"
                 + "<polygon\n     points=\"1,2 3,4 5,6 \"/>"
                 + "<group>"
@@ -88,7 +88,7 @@ namespace SvgToEmbCSVTests
                              + "</svg>"
                          );
 
-            var reader = new CsvReader(source, fillMap);
+            var reader = new SvgReader(source, fillMap);
 
             List<Polygon> lp = reader.Read();
 
@@ -109,7 +109,7 @@ namespace SvgToEmbCSVTests
                 + "</svg>"
             );
 
-            var reader = new CsvReader(source, fillMap);
+            var reader = new SvgReader(source, fillMap);
 
             List<Polygon> lp = reader.Read();
 
@@ -133,7 +133,7 @@ namespace SvgToEmbCSVTests
                 + "</svg>"
             );
 
-            var reader = new CsvReader(source, fillMap);
+            var reader = new SvgReader(source, fillMap);
 
             List<Polygon> lp = reader.Read();
 
@@ -141,6 +141,75 @@ namespace SvgToEmbCSVTests
             Assert.AreEqual(FillTypes.Vertical, lp[0].Fill.FillType);
             Assert.AreEqual(0.3, lp[0].Fill.StitchWidth);
 
+        }
+
+
+        [Test()]
+        public void OneColorIsFound()
+        {
+            var source = System.Xml.Linq.XElement.Parse(
+                "<svg>"
+                + "<polygon\n     points=\"1,2 3,4 5,6 \" style=\"fill:#bbbbcc;stroke:#000000;stroke-width:1\"/>"
+                + "</svg>"
+            );
+
+            var reader = new SvgReader(source, null);
+            List<string> colors = reader.Colors();
+            Assert.AreEqual(1, colors.Count);
+            Assert.AreEqual("#bbbbcc", colors[0]);
+        }
+        [Test()]
+        public void TwoSameColorsAreFoundOnlyOnce()
+        {
+            var source = System.Xml.Linq.XElement.Parse(
+                "<svg>"
+                + "<polygon\n     points=\"1,2 3,4 5,6 \" style=\"fill:#bbbbcc;stroke:#000000;stroke-width:1\"/>"
+                + "<polygon\n     points=\"54,2 3,4 5,6 \" style=\"stroke:#000000;fill:#bbbbcc;stroke-width:1\"/>"
+                + "</svg>"
+            );
+
+            var reader = new SvgReader(source, null);
+            List<string> colors = reader.Colors();
+            Assert.AreEqual(1, colors.Count);
+            Assert.AreEqual("#bbbbcc", colors[0]);
+        }
+
+        [Test()]
+        public void TwoColorsAreFound()
+        {
+            var source = System.Xml.Linq.XElement.Parse(
+                "<svg>"
+                + "<polygon\n     points=\"1,2 3,4 5,6 \" style=\"fill:#bbbbcc;stroke:#000000;stroke-width:1\"/>"
+                + "<polygon\n     points=\"54,2 3,4 5,6 \" style=\"stroke:#000000;fill:#aabbcc;stroke-width:1\"/>"
+                + "</svg>"
+            );
+
+            var reader = new SvgReader(source, null);
+            List<string> colors = reader.Colors();
+            Assert.AreEqual(2, colors.Count);
+            Assert.AreEqual("#bbbbcc", colors[0]);
+            Assert.AreEqual("#aabbcc", colors[1]);
+        }
+
+        [Test()]
+        public void NestedColorsAreFound()
+        {
+            var source = System.Xml.Linq.XElement.Parse(
+                "<svg>"
+                + "<group>"
+                + "<polygon\n     points=\"54,2 3,4 5,6 \" style=\"stroke:#000000;fill:#aabbdd;stroke-width:1\"/>"
+                + "<polygon\n     points=\"1,2 3,4 5,6 \" style=\"fill:#bbbbcc;stroke:#000000;stroke-width:1\"/>"
+                + "</group>"
+                + "<polygon\n     points=\"54,2 3,4 5,6 \" style=\"stroke:#000000;fill:#aabbcc;stroke-width:1\"/>"
+                + "</svg>"
+            );
+
+            var reader = new SvgReader(source, null);
+            List<string> colors = reader.Colors();
+            Assert.AreEqual(3, colors.Count);
+            Assert.AreEqual("#aabbdd", colors[0]);
+            Assert.AreEqual("#bbbbcc", colors[1]);
+            Assert.AreEqual("#aabbcc", colors[2]);
         }
     }
 }
