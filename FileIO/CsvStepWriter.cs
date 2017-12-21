@@ -2,7 +2,7 @@
 using System.Linq;
 using ShapeLib;
 
-namespace SvgToEmbCSV
+namespace FileIO
 {
     public class CsvStepWriter
     {
@@ -45,8 +45,8 @@ namespace SvgToEmbCSV
             var parts = new string[] {
                 "*",
                 typestring,
-                x.ToString("F2", culture),
-                y.ToString("F2", culture)
+                x.ToString("F4", culture),
+                y.ToString("F4", culture)
             };
 
             var surroundedparts = parts.Select(p => this.SurroundWith(p, "\""));

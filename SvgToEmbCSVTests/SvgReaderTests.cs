@@ -4,6 +4,7 @@ using System.Linq;
 using SvgToEmbCSV;
 using ShapeLib;
 using System.Collections.Generic;
+using FileIO;
 
 namespace SvgToEmbCSVTests
 {

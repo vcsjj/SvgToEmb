@@ -31,7 +31,7 @@ namespace SvgToEmbCSVTests
         [Test()]
         public void ColormapOptionEquivalentToCreateStiches()
         {
-            string[] args = new string[] { "-colormap" };
+            string[] args = new string[] { "-writecolormap" };
             OptionParser op = new OptionParser(args);
 
             ActionType t = op.ParseForAction();
@@ -43,7 +43,7 @@ namespace SvgToEmbCSVTests
         [Test()]
         public void FirstOptionWins()
         {
-            string[] args = new string[] { "-colormap", "-stitches" };
+            string[] args = new string[] { "-writecolormap", "-stitches" };
             OptionParser op = new OptionParser(args);
 
             ActionType t = op.ParseForAction();
@@ -54,7 +54,7 @@ namespace SvgToEmbCSVTests
         [Test()]
         public void InputFilenameAndOption()
         {
-            string[] args = new string[] { "-colormap", "myFile" };
+            string[] args = new string[] { "-writecolormap", "myFile" };
             OptionParser op = new OptionParser(args);
 
             string f = op.ParseForInputfile();
@@ -71,6 +71,61 @@ namespace SvgToEmbCSVTests
             string f = op.ParseForInputfile();
 
             Assert.AreEqual("myFile", f);
+        }
+
+        [Test()]
+        public void NoColormapAtAllFilename()
+        {
+            string[] args = new string[] { "--colormap" };
+            OptionParser op = new OptionParser(args);
+
+            string f = op.ParseForColormap();
+
+            Assert.AreEqual(string.Empty, f);
+        }
+
+        [Test()]
+        public void NoColormapSpecifiedFilename()
+        {
+            string[] args = new string[] { "--colormap" , "-stitches"};
+            OptionParser op = new OptionParser(args);
+
+            string f = op.ParseForColormap();
+
+            Assert.AreEqual(string.Empty, f);
+        }
+
+        [Test()]
+        public void ColormapSpecified()
+        {
+            string[] args = new string[] { "--colormap" , "map.csv"};
+            OptionParser op = new OptionParser(args);
+
+            string f = op.ParseForColormap();
+
+            Assert.AreEqual("map.csv", f);
+        }
+
+        [Test()]
+        public void ColormapAndInputFilenameSpecified()
+        {
+            string[] args = new string[] { "--colormap" , "map.csv", "in.svg"};
+            OptionParser op = new OptionParser(args);
+
+            string f = op.ParseForInputfile();
+
+            Assert.AreEqual("in.svg", f);
+        }
+
+        [Test()]
+        public void ColormapNameNotMistakenForInputFilename()
+        {
+            string[] args = new string[] { "--colormap" , "map.csv"};
+            OptionParser op = new OptionParser(args);
+
+            string f = op.ParseForInputfile();
+
+            Assert.AreEqual(string.Empty, f);
         }
     }
 }

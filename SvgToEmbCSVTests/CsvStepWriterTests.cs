@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using System;
 using ShapeLib;
+using FileIO;
 using SvgToEmbCSV;
 
 namespace SvgToEmbCSVTests
@@ -43,25 +44,25 @@ namespace SvgToEmbCSVTests
         }
 
         [Test()]
-        public void XandYHaveTwoDigits()
+        public void XandYHaveFourDigits()
         {
             var step = this.CreateStitchStep();
             CsvStepWriter w = new CsvStepWriter(step);
             string line = w.Write();
             string[] parts = line.Split(',');
-            Assert.AreEqual("1.00", parts[2].Replace("\"", string.Empty));
-            Assert.AreEqual("2.00", parts[3].Replace("\"", string.Empty));
+            Assert.AreEqual("1.0000", parts[2].Replace("\"", string.Empty));
+            Assert.AreEqual("2.0000", parts[3].Replace("\"", string.Empty));
         }
 
         [Test()]
-        public void XandYHaveTwoDigits2()
+        public void XandYHaveFourDigits2()
         {
             var step = this.CreateOtherStitchStep();
             CsvStepWriter w = new CsvStepWriter(step);
             string line = w.Write();
             string[] parts = line.Split(',');
-            Assert.AreEqual("-4.57", parts[2].Replace("\"", string.Empty));
-            Assert.AreEqual("33.10", parts[3].Replace("\"", string.Empty));
+            Assert.AreEqual("-4.5670", parts[2].Replace("\"", string.Empty));
+            Assert.AreEqual("33.1000", parts[3].Replace("\"", string.Empty));
         }
 
         private Step CreateOtherStitchStep() 

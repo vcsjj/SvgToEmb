@@ -36,22 +36,21 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml.Serialization" />
     <Reference Include="System.Xml" />
-    <Reference Include="nunit.framework">
-      <Package>nunit</Package>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="CsvStepWriter.cs" />
     <Compile Include="OptionParser.cs" />
-    <Compile Include="SvgReader.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <ProjectReference Include="..\ShapeLib\ShapeLib.csproj">
       <Project>{1CF57634-A72E-4532-8A3A-0EC16326E418}</Project>
       <Name>ShapeLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FileIO\FileIO.csproj">
+      <Project>{023EC3BA-2B1F-49DD-A66C-021A7C1E0DDC}</Project>
+      <Name>FileIO</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

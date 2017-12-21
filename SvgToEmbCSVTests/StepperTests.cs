@@ -167,7 +167,7 @@ namespace SvgToEmbCSVTests
             p2 = new MyPoint(3, 4);
         }
 
-        private Polygon createDefaultPolygon()
+        protected Polygon createDefaultPolygon()
         {
             return new Polygon(
                 new List<MyPoint> {

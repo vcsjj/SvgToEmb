@@ -7,12 +7,20 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SvgToEmbCSVTests", "SvgToEm
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SvgToEmbCSV", "SvgToEmbCSV\SvgToEmbCSV.csproj", "{ECF442E1-BC09-450D-8B97-ABEA3864437C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestPatternCreator", "TestPatternCreator\TestPatternCreator.csproj", "{D51A7114-AAAB-4374-9639-AA2C72AF8C46}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileIO", "FileIO\FileIO.csproj", "{023EC3BA-2B1F-49DD-A66C-021A7C1E0DDC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{023EC3BA-2B1F-49DD-A66C-021A7C1E0DDC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{023EC3BA-2B1F-49DD-A66C-021A7C1E0DDC}.Debug|x86.Build.0 = Debug|Any CPU
+		{023EC3BA-2B1F-49DD-A66C-021A7C1E0DDC}.Release|x86.ActiveCfg = Release|Any CPU
+		{023EC3BA-2B1F-49DD-A66C-021A7C1E0DDC}.Release|x86.Build.0 = Release|Any CPU
 		{1CF57634-A72E-4532-8A3A-0EC16326E418}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{1CF57634-A72E-4532-8A3A-0EC16326E418}.Debug|x86.Build.0 = Debug|Any CPU
 		{1CF57634-A72E-4532-8A3A-0EC16326E418}.Release|x86.ActiveCfg = Release|Any CPU
@@ -21,6 +29,10 @@ Global
 		{641118C9-C6F4-4514-9601-88C9E2323AB0}.Debug|x86.Build.0 = Debug|Any CPU
 		{641118C9-C6F4-4514-9601-88C9E2323AB0}.Release|x86.ActiveCfg = Release|Any CPU
 		{641118C9-C6F4-4514-9601-88C9E2323AB0}.Release|x86.Build.0 = Release|Any CPU
+		{D51A7114-AAAB-4374-9639-AA2C72AF8C46}.Debug|x86.ActiveCfg = Debug|x86
+		{D51A7114-AAAB-4374-9639-AA2C72AF8C46}.Debug|x86.Build.0 = Debug|x86
+		{D51A7114-AAAB-4374-9639-AA2C72AF8C46}.Release|x86.ActiveCfg = Release|x86
+		{D51A7114-AAAB-4374-9639-AA2C72AF8C46}.Release|x86.Build.0 = Release|x86
 		{ECF442E1-BC09-450D-8B97-ABEA3864437C}.Debug|x86.ActiveCfg = Debug|x86
 		{ECF442E1-BC09-450D-8B97-ABEA3864437C}.Debug|x86.Build.0 = Debug|x86
 		{ECF442E1-BC09-450D-8B97-ABEA3864437C}.Release|x86.ActiveCfg = Release|x86

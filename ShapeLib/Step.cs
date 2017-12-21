@@ -2,8 +2,14 @@
 
 namespace ShapeLib
 {
-    public class Step
+    public class Step : IEquatable<Step>
     {
+        public enum StepType 
+        {
+            Stitch,
+            Trim
+        }
+
         private readonly StepType type;
         public double X => this.point.X;
         public double Y => this.point.Y;
@@ -24,16 +30,18 @@ namespace ShapeLib
             }
         }
 
-        public enum StepType 
-        {
-            Stitch,
-            Trim
-        }
 
         public Step(StepType type, MyPoint p)
         {
             this.type = type;
             this.point = p;
+        }
+
+        public bool Equals(Step other)
+        {
+            return this.Type == other.Type
+                && this.Point.X == other.Point.X
+                && this.Point.Y == other.Point.Y;
         }
     }
 }
