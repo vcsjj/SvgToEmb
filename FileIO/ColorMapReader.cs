@@ -10,7 +10,7 @@ namespace FileIO
         {
         }
 
-        public List<ColorTranslation>  Read(string[] lines)
+        public List<ColorTranslation>  Read(IEnumerable<string> lines)
         {
             var culture = System.Globalization.CultureInfo.InvariantCulture;
             var numberStyle = System.Globalization.NumberStyles.Any;
@@ -18,7 +18,7 @@ namespace FileIO
             var d = new List<ColorTranslation>();
             foreach (var line in lines)
             {
-                string[] colorspec = line.Split(';');
+                string[] colorspec = line.Split(',');
                 if (colorspec.Length != 4)
                     continue;
 
@@ -39,6 +39,7 @@ namespace FileIO
 
             return d;
         }
+
     }
 }
 

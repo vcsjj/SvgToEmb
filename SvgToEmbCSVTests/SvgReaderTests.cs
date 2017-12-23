@@ -78,71 +78,35 @@ namespace SvgToEmbCSVTests
         [Test()]
         public void SimpleColorToFillMap()
         {
-            var fillMap = new Dictionary<string, Fill>
-            {
-                { "#aaaa00", new Fill(FillTypes.Horizontal, 0.2) }
-            };
-
             var source = System.Xml.Linq.XElement.Parse(
                              "<svg>"
                              + "<polygon\n     points=\"1,2 3,4 5,6 \" style=\"fill:#aaaa00;stroke:#000000;stroke-width:1\"/>"
                              + "</svg>"
                          );
 
-            var reader = new SvgReader(source, fillMap);
+            var reader = new SvgReader(source);
 
             List<Polygon> lp = reader.Read();
 
-            Assert.AreEqual(FillTypes.Horizontal, lp.First().Fill.FillType);
+            Assert.AreEqual("#aaaa00", lp.First().Color);
         }
 
         [Test()]
         public void DefaultFillForUndefinedColor()
         {
-            var fillMap = new Dictionary<string, Fill>
-            {
-                { "#aaaa00", new Fill(FillTypes.Vertical, 0.7) }
-            };
-
             var source = System.Xml.Linq.XElement.Parse(
                 "<svg>"
                 + "<polygon\n     points=\"1,2 3,4 5,6 \" style=\"fill:#bcdaa0;stroke:#000000;stroke-width:1\"/>"
                 + "</svg>"
             );
 
-            var reader = new SvgReader(source, fillMap);
+            var reader = new SvgReader(source);
 
             List<Polygon> lp = reader.Read();
 
-            Assert.AreEqual(FillTypes.Horizontal, lp.First().Fill.FillType);
-            Assert.AreEqual(0.2, lp.First().Fill.StitchWidth);
+            Assert.AreEqual("#bcdaa0", lp.First().Color);
         }
 
-        [Test()]
-        public void AdvancedColorToFillMap()
-        {
-            var fillMap = new Dictionary<string, Fill>
-            {
-                { "#aaaa00", new Fill(FillTypes.Horizontal, 0.2) },
-                { "#bbbbcc", new Fill(FillTypes.Vertical, 0.3) }
-            };
-
-            var source = System.Xml.Linq.XElement.Parse(
-                "<svg>"
-                + "<polygon\n     points=\"1,2 3,4 5,6 \" style=\"fill:#bbbbcc;stroke:#000000;stroke-width:1\"/>"
-                + "<polygon\n     points=\"1,2 3,4 5,6 \" style=\"fill:#aaaa00;stroke:#000000;stroke-width:1\"/>"
-                + "</svg>"
-            );
-
-            var reader = new SvgReader(source, fillMap);
-
-            List<Polygon> lp = reader.Read();
-
-            Assert.AreEqual(FillTypes.Horizontal, lp[1].Fill.FillType);
-            Assert.AreEqual(FillTypes.Vertical, lp[0].Fill.FillType);
-            Assert.AreEqual(0.3, lp[0].Fill.StitchWidth);
-
-        }
 
 
         [Test()]
@@ -154,7 +118,7 @@ namespace SvgToEmbCSVTests
                 + "</svg>"
             );
 
-            var reader = new SvgReader(source, null);
+            var reader = new SvgReader(source);
             List<string> colors = reader.Colors();
             Assert.AreEqual(1, colors.Count);
             Assert.AreEqual("#bbbbcc", colors[0]);
@@ -169,7 +133,7 @@ namespace SvgToEmbCSVTests
                 + "</svg>"
             );
 
-            var reader = new SvgReader(source, null);
+            var reader = new SvgReader(source);
             List<string> colors = reader.Colors();
             Assert.AreEqual(1, colors.Count);
             Assert.AreEqual("#bbbbcc", colors[0]);
@@ -185,7 +149,7 @@ namespace SvgToEmbCSVTests
                 + "</svg>"
             );
 
-            var reader = new SvgReader(source, null);
+            var reader = new SvgReader(source);
             List<string> colors = reader.Colors();
             Assert.AreEqual(2, colors.Count);
             Assert.AreEqual("#bbbbcc", colors[0]);
@@ -205,7 +169,7 @@ namespace SvgToEmbCSVTests
                 + "</svg>"
             );
 
-            var reader = new SvgReader(source, null);
+            var reader = new SvgReader(source);
             List<string> colors = reader.Colors();
             Assert.AreEqual(3, colors.Count);
             Assert.AreEqual("#aabbdd", colors[0]);

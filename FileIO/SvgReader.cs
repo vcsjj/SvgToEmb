@@ -8,14 +8,12 @@ namespace FileIO
 {
     public class SvgReader
     {
+        private const string defaultColor = "#000000";
         private readonly System.Xml.Linq.XElement source;
-
-        private readonly Dictionary<string, Fill> fillMap;
-
-        public SvgReader(System.Xml.Linq.XElement xElement, Dictionary<string, Fill> fillmap = null)
+      
+        public SvgReader(System.Xml.Linq.XElement xElement)
         {
             this.source = xElement;
-            this.fillMap = fillmap ?? new Dictionary<string, Fill>();
         }
 
         public List<Polygon> Read()
@@ -89,6 +87,12 @@ namespace FileIO
             return string.Empty;
         }
 
+        static string ColorFromStyle(string styleString) => styleString?.Split(';')
+            .DefaultIfEmpty("fill:" + defaultColor)
+            .First(s => s.ToLower()
+                .StartsWith("fill:"))
+            ?.Substring(5) ?? defaultColor;
+
         Polygon ExtractPolygon(XElement l1)
         {
             var culture = System.Globalization.CultureInfo.InvariantCulture;
@@ -97,7 +101,9 @@ namespace FileIO
             string pointsString = l1.Attribute("points")?.Value;
             string styleString = l1.Attribute("style")?.Value;
             string transformationString = l1.Attribute("transform")?.Value;
-            Fill f = (!string.IsNullOrEmpty(styleString) && this.fillMap != null) ? this.fillMap.Where(kvp => styleString.Contains(kvp.Key)).DefaultIfEmpty(new KeyValuePair<string, Fill>(string.Empty, Fill.Default())).First().Value : Fill.Default();
+
+            string color = ColorFromStyle(styleString);
+            
             double[] transformation = new double[] {
                 1,
                 0,
@@ -124,7 +130,7 @@ namespace FileIO
                         l.Add(new MyPoint(x, y, transformation));
                     }
                 }
-                ret = new Polygon(l, f);
+                ret = new Polygon(l, color);
             }
 
             return ret;

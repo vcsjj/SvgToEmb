@@ -7,7 +7,7 @@ namespace ShapeLib
 {
 	public class Polygon
 	{
-        public Fill Fill
+        public string Color
         {
             get;
         }
@@ -27,9 +27,9 @@ namespace ShapeLib
 			}
 		} 
 
-        public Polygon(IEnumerable<MyPoint> points, Fill fill = null)
+        public Polygon(IEnumerable<MyPoint> points, string color = "")
 		{
-            this.Fill = fill;
+            this.Color = color;
 			foreach (var item in points) 
 			{
 				this.Vertices.Add (item);

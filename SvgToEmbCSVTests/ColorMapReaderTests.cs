@@ -32,7 +32,7 @@ namespace SvgToEmbCSVTests
         public void AcceptsLineWithCorrectNumberOfFields()
         {
             var c = new ColorMapReader();
-            List<ColorTranslation>  d = c.Read(new []{"#aa00dd;1.2;30;0.2", "1;2;3"});
+            List<ColorTranslation>  d = c.Read(new []{"#aa00dd,1.2,30,0.2", "1,2,3"});
 
             Assert.AreEqual(1, d.Count);
         }
@@ -41,7 +41,7 @@ namespace SvgToEmbCSVTests
         public void ParsesDoubleFields()
         {
             var c = new ColorMapReader();
-            List<ColorTranslation> d = c.Read(new []{"#aa00dd;1.2;30;0.2", "1;2;3"});
+            List<ColorTranslation> d = c.Read(new []{"#aa00dd,1.2,30,0.2", "1,2,3"});
 
             Assert.AreEqual("#aa00dd", d[0].Color);
             Assert.AreEqual(1.2, d[0].StepWidth);
