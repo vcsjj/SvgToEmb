@@ -12,9 +12,9 @@ namespace SvgToEmbCSVTests
         public void StepsCountainNoDoubles()
         {
             Polygon p = this.createDefaultPolygon();
-            HorizontalStepper hs = new HorizontalStepper(p);
+            HorizontalStepper hs = new HorizontalStepper(p, 1.0);
 
-            List<Step> steps = hs.CalculateSteps(1);
+            List<Step> steps = hs.CalculateSteps();
 
             bool isRepeated = false;
             var set = new HashSet<Tuple<double,double>>();
@@ -34,8 +34,8 @@ namespace SvgToEmbCSVTests
         public void FirstPointIsIdenticalWithUpperLeftCorner()
         {
             Polygon p = this.createDefaultPolygon();
-            HorizontalStepper hs = new HorizontalStepper(p);
-            List<Step> steps = hs.CalculateSteps(1);
+            HorizontalStepper hs = new HorizontalStepper(p, 1.0);
+            List<Step> steps = hs.CalculateSteps();
 
             Assert.AreEqual(p.GetTopLeft(), steps[0].Point);
         }
@@ -44,8 +44,8 @@ namespace SvgToEmbCSVTests
         public void FindsThreeIntersectionsForLargeHeight()
         {
             Polygon p = this.createTriangle();
-            HorizontalStepper hs = new HorizontalStepper(p);
-            List<Step> steps = hs.CalculateSteps(0.9);
+            HorizontalStepper hs = new HorizontalStepper(p, 0.9);
+            List<Step> steps = hs.CalculateSteps();
 
             Assert.AreEqual(3, steps.Count);
         }
@@ -54,8 +54,8 @@ namespace SvgToEmbCSVTests
         public void FindsFiveIntersectionsForMediumHeight()
         {
             Polygon p = this.createTriangle();
-            HorizontalStepper hs = new HorizontalStepper(p);
-            List<Step> steps = hs.CalculateSteps(0.45);
+            HorizontalStepper hs = new HorizontalStepper(p, 0.45);
+            List<Step> steps = hs.CalculateSteps();
 
             Assert.AreEqual(5, steps.Count);
         }
@@ -64,8 +64,8 @@ namespace SvgToEmbCSVTests
         public void FindsThreeIntersectionsForLargeHeightInverse()
         {
             Polygon p = this.createInverseTriangle();
-            HorizontalStepper hs = new HorizontalStepper(p);
-            List<Step> steps = hs.CalculateSteps(0.9);
+            HorizontalStepper hs = new HorizontalStepper(p, 0.9);
+            List<Step> steps = hs.CalculateSteps();
 
             Assert.AreEqual(3, steps.Count);
         }
@@ -74,8 +74,8 @@ namespace SvgToEmbCSVTests
         public void FindsFiveIntersectionsForMediumHeightInverse()
         {
             Polygon p = this.createInverseTriangle();
-            HorizontalStepper hs = new HorizontalStepper(p);
-            List<Step> steps = hs.CalculateSteps(0.45);
+            HorizontalStepper hs = new HorizontalStepper(p, 0.45);
+            List<Step> steps = hs.CalculateSteps();
 
             Assert.AreEqual(5, steps.Count);
         }
@@ -159,6 +159,54 @@ namespace SvgToEmbCSVTests
             var first = intersection[0];
             var second = intersection[1];
             Assert.IsTrue(first.X <= second.X);
+        }
+
+        [Test()]
+        public void AdditionalStepsAreAddedIfDistanceIsTooBigY()
+        {
+            List<Step> l = new List<Step>
+            {
+                new Step(Step.StepType.Stitch, new MyPoint(0.0, 0.0)),
+                new Step(Step.StepType.Stitch, new MyPoint(0.0, 10.0))
+            };
+
+            List<Step> filledList = HorizontalStepper.AddInbetweenStitches(l, 5.0);
+            Assert.AreEqual(3, filledList.Count);
+            Assert.AreEqual(0.0, filledList[0].Point.Y);
+            Assert.AreEqual(5.0, filledList[1].Point.Y);
+            Assert.AreEqual(10.0, filledList[2].Point.Y);
+
+        }
+
+        [Test()]
+        public void AdditionalStepsAreAddedIfDistanceIsTooBigX()
+        {
+            List<Step> l = new List<Step>
+                {
+                    new Step(Step.StepType.Stitch, new MyPoint(0.0, 0.0)),
+                    new Step(Step.StepType.Stitch, new MyPoint(1.0, 0.0))
+                };
+
+            List<Step> filledList = HorizontalStepper.AddInbetweenStitches(l, 0.5);
+
+
+            Assert.AreEqual(0.0, filledList[0].Point.X);
+            Assert.AreEqual(0.5, filledList[1].Point.X);
+            Assert.AreEqual(1.0, filledList[2].Point.X);
+        }
+
+        [Test()]
+        public void AdditionalStepsAreAddedIfDistanceIsTooBig2()
+        {
+            List<Step> l = new List<Step>
+                {
+                    new Step(Step.StepType.Stitch, new MyPoint(0.0, 0.0)),
+                    new Step(Step.StepType.Stitch, new MyPoint(0.0, 9.0))
+                };
+
+            List<Step> filledList = HorizontalStepper.AddInbetweenStitches(l, 5.0);
+
+            Assert.AreEqual(3, filledList.Count);
         }
 
         private static void CreateLinePoints(out MyPoint p1, out MyPoint p2)

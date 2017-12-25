@@ -37,7 +37,6 @@
     <Compile Include="MyPoint.cs" />
     <Compile Include="HorizontalStepper.cs" />
     <Compile Include="BoundingBox.cs" />
-    <Compile Include="VerticalStepper.cs" />
     <Compile Include="IStepper.cs" />
     <Compile Include="Step.cs" />
     <Compile Include="TransformationParser.cs" />

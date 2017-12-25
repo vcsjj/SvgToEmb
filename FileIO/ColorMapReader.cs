@@ -37,7 +37,7 @@ namespace FileIO
                     continue;
                 if (!double.TryParse(moveInside, numberStyle, culture, out mi))
                     continue;
-                d.Add(new ColorTranslation{Color = color, StepWidth = sw, StepAngle = sa, MoveInside = mi, MaxStepLength = ma});
+                d.Add(new ColorTranslation{Color = color, LineHeight = sw, StepAngle = sa, MoveInside = mi, MaxStepLength = ma});
             }
 
             return d;

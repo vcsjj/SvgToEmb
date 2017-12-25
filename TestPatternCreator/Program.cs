@@ -10,13 +10,15 @@ namespace TestPatternCreator
         public static void Main(string[] args)
         {
             List<Step> steps = new List<Step>();
-            int angles = 5;
-            int widths = 5;
-            double minWidth = 0.2;
-            double maxWidth = 1.0;
+            int angles = 2;
+            int widths = 2;
+            double minWidth = 0.4;
+            double maxWidth = 0.8;
 
             double patchSize = 10; //mm
             double patchDistance = 4;
+
+            double maxStepLength = 3;
 
             for (int i = 0; i < angles; i++)
             {
@@ -27,7 +29,7 @@ namespace TestPatternCreator
                 {
                     double yPosition = j * (patchSize + patchDistance);
                     double lineHeight = minWidth +  (double)j * (maxWidth - minWidth) / (double)widths;
-                    steps.AddRange(CreatePatch(patchSize, xPosition, yPosition, angle, lineHeight));
+                    steps.AddRange(CreatePatch(patchSize, xPosition, yPosition, angle, lineHeight, maxStepLength));
                 }
             }
 
@@ -39,7 +41,7 @@ namespace TestPatternCreator
             Console.WriteLine(CsvStepWriter.WriteClosingSequence());
         }
 
-        static IEnumerable<Step> CreatePatch(double patchSize, double xPosition, double yPosition, double angle, double lineHeight)
+        static IEnumerable<Step> CreatePatch(double patchSize, double xPosition, double yPosition, double angle, double lineHeight, double maxStepLength)
         {
             var points = new MyPoint[] { new MyPoint(xPosition, yPosition), 
                 new MyPoint(xPosition + patchSize, yPosition),
@@ -48,8 +50,8 @@ namespace TestPatternCreator
             
             Polygon p = new Polygon(points, null);
 
-            var s = new AngleStepper(p, angle);
-            return s.CalculateSteps(lineHeight);
+            var s = new AngleStepper(p, angle, lineHeight, maxStepLength);
+            return s.CalculateSteps();
         }
     }
 }

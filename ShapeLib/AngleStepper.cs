@@ -6,16 +6,19 @@ namespace ShapeLib
     public class AngleStepper : IStepper
     {
         private readonly double angle;
-
+        private readonly double lineHeight;
+        private readonly double maxStepLength;
         private readonly Polygon p;
 
-        public AngleStepper(Polygon p, double angle)
+        public AngleStepper(Polygon p, double angle, double lineHeight, double maxStepLength = double.PositiveInfinity )
         {
             this.p = p;
             this.angle = angle;
+            this.lineHeight = lineHeight;
+            this.maxStepLength = maxStepLength;
         }
 
-        public System.Collections.Generic.List<Step> CalculateSteps(double lineHeight)
+        public System.Collections.Generic.List<Step> CalculateSteps()
         {
             var rList = new List<MyPoint>();
             foreach (var p in this.p.Vertices)
@@ -25,8 +28,8 @@ namespace ShapeLib
             }
 
             Polygon p2 = new Polygon(rList);
-            HorizontalStepper h = new HorizontalStepper(p2);
-            var rotatedResult = h.CalculateSteps(lineHeight);
+            HorizontalStepper h = new HorizontalStepper(p2, this.lineHeight, this.maxStepLength);
+            var rotatedResult = h.CalculateSteps();
 
             var result = new List<Step>();
             foreach (var p in rotatedResult)

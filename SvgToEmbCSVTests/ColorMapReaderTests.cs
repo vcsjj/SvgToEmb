@@ -44,7 +44,7 @@ namespace SvgToEmbCSVTests
             List<ColorTranslation> d = c.Read(new []{"#aa00dd,1.2,4.0,30,0.2", "1,2,3"});
 
             Assert.AreEqual("#aa00dd", d[0].Color);
-            Assert.AreEqual(1.2, d[0].StepWidth);
+            Assert.AreEqual(1.2, d[0].LineHeight);
             Assert.AreEqual(30, d[0].StepAngle);
             Assert.AreEqual(0.2, d[0].MoveInside);
             Assert.AreEqual(4.0, d[0].MaxStepLength);

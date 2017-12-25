@@ -11,12 +11,14 @@ namespace SvgToEmbCSVTests
         [Test()]
         public void Angle0IsIdenticalWithHorizontal()
         {
+            var d = 0.234;
             Polygon p = this.createDefaultPolygon();
-            HorizontalStepper hs = new HorizontalStepper(p);
-            AngleStepper a = new AngleStepper(p, 0);
+            HorizontalStepper hs = new HorizontalStepper(p, d);
+            AngleStepper a = new AngleStepper(p, 0, d);
 
-            List<Step> stepsHorizontal = hs.CalculateSteps(0.234);
-            List<Step> stepsAngle = a.CalculateSteps(0.234);
+
+            List<Step> stepsHorizontal = hs.CalculateSteps();
+            List<Step> stepsAngle = a.CalculateSteps();
 
             CollectionAssert.AreEqual(stepsHorizontal, stepsAngle);
         }
@@ -25,26 +27,14 @@ namespace SvgToEmbCSVTests
         public void Angle1IsNotIdenticalWithHorizontal()
         {
             Polygon p = this.createDefaultPolygon();
-            HorizontalStepper hs = new HorizontalStepper(p);
-            AngleStepper a = new AngleStepper(p, 1.0);
+            const double d = 0.234;
+            HorizontalStepper hs = new HorizontalStepper(p, d);
+            AngleStepper a = new AngleStepper(p, 1.0, d);
 
-            List<Step> stepsHorizontal = hs.CalculateSteps(0.234);
-            List<Step> stepsAngle = a.CalculateSteps(0.234);
+            List<Step> stepsHorizontal = hs.CalculateSteps();
+            List<Step> stepsAngle = a.CalculateSteps();
 
             CollectionAssert.AreNotEqual(stepsHorizontal, stepsAngle);
-        }
-
-        [Test()]
-        public void Angle90IsIdenticalWithVertical()
-        {
-            Polygon p = this.createDefaultPolygon();
-            VerticalStepper hs = new VerticalStepper(p);
-            AngleStepper a = new AngleStepper(p, 90);
-
-            List<Step> stepsVertical = hs.CalculateSteps(0.234);
-            List<Step> stepsAngle = a.CalculateSteps(0.234);
-
-            CollectionAssert.AreEqual(stepsVertical, stepsAngle);
         }
     }
 }

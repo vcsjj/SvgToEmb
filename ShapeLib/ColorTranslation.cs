@@ -4,9 +4,9 @@ namespace ShapeLib
 {
     public struct ColorTranslation
     {
-        public static ColorTranslation Default = new ColorTranslation {Color = "#000000", StepAngle = 0, StepWidth=0.5, MaxStepLength = 3.0, MoveInside = 0.0};
+        public static ColorTranslation Default = new ColorTranslation {Color = "#000000", StepAngle = 0, LineHeight=0.5, MaxStepLength = 3.0, MoveInside = 0.0};
         public string Color;
-        public double StepWidth;
+        public double LineHeight;
         public double StepAngle;
         public double MoveInside;
         public double MaxStepLength;
@@ -17,7 +17,7 @@ namespace ShapeLib
             return string.Join(",", new string[]
                 {
                     Color,
-                    StepWidth.ToString(culture),
+                    LineHeight.ToString(culture),
                     MaxStepLength.ToString(culture),
                     StepAngle.ToString(culture),
                     MoveInside.ToString(culture),
@@ -25,7 +25,7 @@ namespace ShapeLib
             );
         }
 
-        public const string Header = "Color,StepWidth,MaxStepLength,StepAngle,MoveInside";
+        public const string Header = "Color,LineHeight,MaxStepLength,StepAngle,MoveInside";
     }
 }
 

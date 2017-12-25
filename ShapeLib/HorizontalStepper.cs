@@ -7,14 +7,18 @@ namespace ShapeLib
     public class HorizontalStepper : IStepper
     {
         private readonly Polygon p;
+        private readonly double lineHeight;
+        private readonly double maxStepLength;
 
-        public HorizontalStepper(Polygon p)
+        public HorizontalStepper(Polygon p, double lineHeight, double maxStepLength = double.PositiveInfinity)
         {
             this.p = p;
+            this.lineHeight = lineHeight;
+            this.maxStepLength = maxStepLength;
         }
 
 
-        public List<Step> CalculateSteps(double lineHeight)
+        public List<Step> CalculateSteps()
         {
             var l = new List<Step>();
             var firstVertex = this.p.GetTopLeft();
@@ -23,7 +27,7 @@ namespace ShapeLib
 
             for (double y = bb.Top-lineHeight; y > bb.Bottom; y -= lineHeight)
             {
-                List<Step> t = FindIntersections(y, this.p);
+                List<Step> t = FindIntersections(y, this.p, this.maxStepLength);
                 l.AddRange(t);
             }
 
@@ -54,7 +58,7 @@ namespace ShapeLib
             return new MyPoint((y - offset) / slope, y);
         }
 
-        public static List<Step> FindIntersections(double y, Polygon poly)
+        public static List<Step> FindIntersections(double y, Polygon poly, double maxStepLength = double.PositiveInfinity)
         {
             var result = new List<Step>();
             for (int lineFromIndex = 0; lineFromIndex < poly.Vertices.Count; lineFromIndex++)
@@ -81,7 +85,41 @@ namespace ShapeLib
                 .Select<KeyValuePair<Step, double>, Step>(kvp => kvp.Key)
                 .ToList();
 
-            return sortedByX;
+            return AddInbetweenStitches(sortedByX, maxStepLength);
+        }
+
+        public static List<Step> AddInbetweenStitches(List<Step> l, double dMax)
+        {
+            
+            var result = new List<Step>();
+            if(l.Count == 0) 
+                return result;
+            
+            result.Add(l[0]);
+            for (int i = 1; i < l.Count; i++)
+            {
+                var pre = l[i - 1];
+                var cur = l[i];
+
+                var distance = cur.Point.Distance(pre.Point);
+                if (distance > dMax)
+                {
+                    
+
+                    int parts = (int)Math.Ceiling(distance / dMax);
+                    for (int p = 1; p <= parts; p++)
+                    {
+                        var intermediatePoint = new MyPoint(pre.X + p * (cur.X - pre.X) / parts, pre.Y + p * (cur.Y - pre.Y) / parts);
+                        result.Add(new Step(Step.StepType.Stitch, intermediatePoint));
+                    }
+                }
+                else
+                {
+                    result.Add(cur);
+                }
+            }
+
+            return result;
         }
     }
 }
