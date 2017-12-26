@@ -91,7 +91,12 @@ namespace SvgToEmbCSV
                 .DefaultIfEmpty(ColorTranslation.Default)
                 .First();
             
-            IStepper s = new AngleStepper(poly, colortranslation.StepAngle, colortranslation.LineHeight, colortranslation.MaxStepLength);
+            IStepper s = new AngleStepper(
+                poly, 
+                colortranslation.StepAngle, 
+                colortranslation.LineHeight, 
+                colortranslation.MaxStepLength, 
+                colortranslation.MoveInside);
 
             var stepsOrig = s.CalculateSteps();
             var steps = stepsOrig.Select(p => new Step(p.Type, new MyPoint(p.Point.X, p.Point.Y)));

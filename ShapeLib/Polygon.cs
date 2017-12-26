@@ -36,6 +36,42 @@ namespace ShapeLib
 			}
 		}
 
+        public MyPoint CenterOfMass()
+        {
+            var cX = this.vertices.Select(v => v.X).Sum() / this.vertices.Count;
+            var cY = this.vertices.Select(v => v.Y).Sum() / this.vertices.Count;
+
+            return new MyPoint(cX, cY);
+        }
+
+        public Polygon MoveInside(double d)
+        {
+            var bb = this.GetBoundingBox();
+            double width = bb.Right - bb.Left;
+            double height = bb.Top - bb.Bottom;
+
+            double theLarger = width > height ? width : height;
+
+            double scalingFactor = (theLarger - 2*d) / theLarger;
+
+            return this.Scale(scalingFactor);
+        }
+
+        public Polygon Scale(double d)
+        {
+            var scaledVertices = new List<MyPoint>();
+            var com = this.CenterOfMass();
+            foreach (var p in this.vertices)
+            {
+
+                double newX = (p.X - com.X) * d + com.X;
+                double newY = (p.Y - com.Y) * d + com.Y;
+                scaledVertices.Add(new MyPoint(newX, newY));
+            }
+
+            return new Polygon(scaledVertices);
+        }
+
         public MyPoint GetTopLeft()
         {
             var v = new List<MyPoint>(this.Vertices);

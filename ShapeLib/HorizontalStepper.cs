@@ -9,29 +9,33 @@ namespace ShapeLib
         private readonly Polygon p;
         private readonly double lineHeight;
         private readonly double maxStepLength;
+        private readonly double moveInside;
 
-        public HorizontalStepper(Polygon p, double lineHeight, double maxStepLength = double.PositiveInfinity)
+        public HorizontalStepper(Polygon p, double lineHeight, double maxStepLength = double.PositiveInfinity, double moveInside = 0.0)
         {
             this.p = p;
             this.lineHeight = lineHeight;
             this.maxStepLength = maxStepLength;
+            this.moveInside = moveInside;
         }
 
 
         public List<Step> CalculateSteps()
         {
+            var polygon = this.p.MoveInside(this.moveInside);
+
             var l = new List<Step>();
-            var firstVertex = this.p.GetTopLeft();
+            var firstVertex = polygon.GetTopLeft();
             var bb = this.p.GetBoundingBox();
             l.Add(new Step(Step.StepType.Trim, firstVertex));
 
             for (double y = bb.Top-lineHeight; y > bb.Bottom; y -= lineHeight)
             {
-                List<Step> t = FindIntersections(y, this.p, this.maxStepLength);
+                List<Step> t = FindIntersections(y, polygon);
                 l.AddRange(t);
             }
 
-            return l;
+            return AddInbetweenStitches(l, this.maxStepLength);
         }
 
         public static MyPoint FindIntersection(MyPoint fromPoint, MyPoint toPoint, double y)
@@ -58,7 +62,7 @@ namespace ShapeLib
             return new MyPoint((y - offset) / slope, y);
         }
 
-        public static List<Step> FindIntersections(double y, Polygon poly, double maxStepLength = double.PositiveInfinity)
+        public static List<Step> FindIntersections(double y, Polygon poly)
         {
             var result = new List<Step>();
             for (int lineFromIndex = 0; lineFromIndex < poly.Vertices.Count; lineFromIndex++)
@@ -85,7 +89,7 @@ namespace ShapeLib
                 .Select<KeyValuePair<Step, double>, Step>(kvp => kvp.Key)
                 .ToList();
 
-            return AddInbetweenStitches(sortedByX, maxStepLength);
+            return sortedByX;
         }
 
         public static List<Step> AddInbetweenStitches(List<Step> l, double dMax)

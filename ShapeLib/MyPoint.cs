@@ -86,6 +86,19 @@ namespace ShapeLib
             xo = x*a + y*c + e;
             yo = x*b + y*d + f;
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is MyPoint)
+            {
+                var p2 = obj as MyPoint;
+                return p2.X == this.X && p2.Y == this.Y;
+            }
+            else
+            {
+                return false;
+            }
+        }
 	}
 }
 
