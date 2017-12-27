@@ -119,7 +119,7 @@ namespace FileIO
             if (!string.IsNullOrEmpty(pointsString))
             {
                 string[] positionList = pointsString.Split(' ');
-                List<MyPoint> l = new List<MyPoint>();
+                List<Point> l = new List<Point>();
                 foreach (string position in positionList)
                 {
                     string[] xy = position.Split(',');
@@ -127,7 +127,7 @@ namespace FileIO
                     double y = 0.0;
                     if (double.TryParse(xy[0], numberStyle, culture, out x) && double.TryParse(xy[1], numberStyle, culture, out y))
                     {
-                        l.Add(new MyPoint(x, y, transformation));
+                        l.Add(new Point(x, y, transformation));
                     }
                 }
                 ret = new Polygon(l, color);

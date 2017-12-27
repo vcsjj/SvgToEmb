@@ -8,11 +8,25 @@ namespace SvgToEmbCSVTests
     [TestFixture()]
     public class StepperTests
     {
+        Polygon polygon;
+        ColorTranslation colorTranslation;
+        Polygon triangle;
+        Polygon inverseTriangle;
+
+        [TestFixtureSetUp()]
+        public void Setup() 
+        {
+            this.polygon = this.createDefaultPolygon();
+            this.triangle = this.createTriangle();
+            this.inverseTriangle = this.createInverseTriangle();
+            this.colorTranslation = this.createDefaultColorTranslation(1.0);
+        }
+
         [Test()]
         public void StepsCountainNoDoubles()
         {
-            Polygon p = this.createDefaultPolygon();
-            HorizontalStepper hs = new HorizontalStepper(p, 1.0);
+
+            HorizontalStepper hs = new HorizontalStepper(this.polygon, this.colorTranslation);
 
             List<Step> steps = hs.CalculateSteps();
 
@@ -33,18 +47,17 @@ namespace SvgToEmbCSVTests
         [Test()]
         public void FirstPointIsIdenticalWithUpperLeftCorner()
         {
-            Polygon p = this.createDefaultPolygon();
-            HorizontalStepper hs = new HorizontalStepper(p, 1.0);
+            HorizontalStepper hs = new HorizontalStepper(this.polygon, this.colorTranslation);
             List<Step> steps = hs.CalculateSteps();
 
-            Assert.AreEqual(p.GetTopLeft(), steps[0].Point);
+            Assert.AreEqual(this.polygon.GetTopLeft(), steps[0].Point);
         }
 
         [Test()]
         public void FindsThreeIntersectionsForLargeHeight()
         {
-            Polygon p = this.createTriangle();
-            HorizontalStepper hs = new HorizontalStepper(p, 0.9);
+            this.colorTranslation.LineHeight = 0.9;
+            HorizontalStepper hs = new HorizontalStepper(this.triangle, this.colorTranslation);
             List<Step> steps = hs.CalculateSteps();
 
             Assert.AreEqual(3, steps.Count);
@@ -53,8 +66,8 @@ namespace SvgToEmbCSVTests
         [Test()]
         public void FindsFiveIntersectionsForMediumHeight()
         {
-            Polygon p = this.createTriangle();
-            HorizontalStepper hs = new HorizontalStepper(p, 0.45);
+            this.colorTranslation.LineHeight = 0.45;
+            HorizontalStepper hs = new HorizontalStepper(this.triangle, this.colorTranslation);
             List<Step> steps = hs.CalculateSteps();
 
             Assert.AreEqual(5, steps.Count);
@@ -63,8 +76,8 @@ namespace SvgToEmbCSVTests
         [Test()]
         public void FindsThreeIntersectionsForLargeHeightInverse()
         {
-            Polygon p = this.createInverseTriangle();
-            HorizontalStepper hs = new HorizontalStepper(p, 0.9);
+            this.colorTranslation.LineHeight = 0.9;
+            HorizontalStepper hs = new HorizontalStepper(this.inverseTriangle, this.colorTranslation);
             List<Step> steps = hs.CalculateSteps();
 
             Assert.AreEqual(3, steps.Count);
@@ -73,8 +86,8 @@ namespace SvgToEmbCSVTests
         [Test()]
         public void FindsFiveIntersectionsForMediumHeightInverse()
         {
-            Polygon p = this.createInverseTriangle();
-            HorizontalStepper hs = new HorizontalStepper(p, 0.45);
+            this.colorTranslation.LineHeight = 0.45;
+            HorizontalStepper hs = new HorizontalStepper(this.inverseTriangle, this.colorTranslation);
             List<Step> steps = hs.CalculateSteps();
 
             Assert.AreEqual(5, steps.Count);
@@ -83,7 +96,7 @@ namespace SvgToEmbCSVTests
         [Test()]
         public void FindValidIntersectionTest()
         {
-            MyPoint p1, p2;
+            Point p1, p2;
             CreateLinePoints(out p1, out p2);
             var intersection = HorizontalStepper.FindIntersection(p1, p2, 0);
 
@@ -94,7 +107,7 @@ namespace SvgToEmbCSVTests
         [Test()]
         public void FindLowerPointIntersectionTest()
         {
-            MyPoint p1, p2;
+            Point p1, p2;
             CreateLinePoints(out p1, out p2);
             var intersection = HorizontalStepper.FindIntersection(p1, p2, -4);
 
@@ -104,7 +117,7 @@ namespace SvgToEmbCSVTests
         [Test()]
         public void FindUpperPointIntersectionTest()
         {
-            MyPoint p1, p2;
+            Point p1, p2;
             CreateLinePoints(out p1, out p2);
             var intersection = HorizontalStepper.FindIntersection(p1, p2, 4);
 
@@ -114,7 +127,7 @@ namespace SvgToEmbCSVTests
         [Test()]
         public void FindInvalidPointIntersectionReturnsNullTest([Values(-5, 5, double.PositiveInfinity, double.NegativeInfinity, double.NaN)]double d)
         {
-            MyPoint p1, p2;
+            Point p1, p2;
             CreateLinePoints(out p1, out p2);
             var intersection = HorizontalStepper.FindIntersection(p1, p2, d);
 
@@ -166,8 +179,8 @@ namespace SvgToEmbCSVTests
         {
             List<Step> l = new List<Step>
             {
-                new Step(Step.StepType.Stitch, new MyPoint(0.0, 0.0)),
-                new Step(Step.StepType.Stitch, new MyPoint(0.0, 10.0))
+                new Step(Step.StepType.Stitch, new Point(0.0, 0.0)),
+                new Step(Step.StepType.Stitch, new Point(0.0, 10.0))
             };
 
             List<Step> filledList = HorizontalStepper.AddInbetweenStitches(l, 5.0);
@@ -183,8 +196,8 @@ namespace SvgToEmbCSVTests
         {
             List<Step> l = new List<Step>
                 {
-                    new Step(Step.StepType.Stitch, new MyPoint(0.0, 0.0)),
-                    new Step(Step.StepType.Stitch, new MyPoint(1.0, 0.0))
+                    new Step(Step.StepType.Stitch, new Point(0.0, 0.0)),
+                    new Step(Step.StepType.Stitch, new Point(1.0, 0.0))
                 };
 
             List<Step> filledList = HorizontalStepper.AddInbetweenStitches(l, 0.5);
@@ -200,8 +213,8 @@ namespace SvgToEmbCSVTests
         {
             List<Step> l = new List<Step>
                 {
-                    new Step(Step.StepType.Stitch, new MyPoint(0.0, 0.0)),
-                    new Step(Step.StepType.Stitch, new MyPoint(0.0, 9.0))
+                    new Step(Step.StepType.Stitch, new Point(0.0, 0.0)),
+                    new Step(Step.StepType.Stitch, new Point(0.0, 9.0))
                 };
 
             List<Step> filledList = HorizontalStepper.AddInbetweenStitches(l, 5.0);
@@ -209,20 +222,20 @@ namespace SvgToEmbCSVTests
             Assert.AreEqual(3, filledList.Count);
         }
 
-        private static void CreateLinePoints(out MyPoint p1, out MyPoint p2)
+        private static void CreateLinePoints(out Point p1, out Point p2)
         {
-            p1 = new MyPoint(1, -4);
-            p2 = new MyPoint(3, 4);
+            p1 = new Point(1, -4);
+            p2 = new Point(3, 4);
         }
 
         protected Polygon createDefaultPolygon()
         {
             return new Polygon(
-                new List<MyPoint> {
-                new MyPoint(0, 0),
-                new MyPoint(0, 1),
-                new MyPoint(1, 1),
-                new MyPoint(1, 0),
+                new List<Point> {
+                new Point(0, 0),
+                new Point(0, 1),
+                new Point(1, 1),
+                new Point(1, 0),
             }
             );
         }
@@ -230,42 +243,49 @@ namespace SvgToEmbCSVTests
         private Polygon createTriangle()
         {
             return new Polygon(
-                new List<MyPoint> {
-                new MyPoint(0, 1),
-                new MyPoint(1, 1),
-                new MyPoint(1, 0),
+                new List<Point> {
+                new Point(0, 1),
+                new Point(1, 1),
+                new Point(1, 0),
             }
             );
         }
         private Polygon createInverseTriangle()
         {
             return new Polygon(
-                new List<MyPoint> {
-                new MyPoint(0, 0),
-                new MyPoint(1, 0),
-                new MyPoint(0.5, -1),
+                new List<Point> {
+                new Point(0, 0),
+                new Point(1, 0),
+                new Point(0.5, -1),
             }
             );
         }
         private Polygon createInverseTriangleOrder2()
         {
             return new Polygon(
-                new List<MyPoint> {
-                new MyPoint(1, 0),
-                new MyPoint(0.5, -1),
-                new MyPoint(0, 0),
+                new List<Point> {
+                new Point(1, 0),
+                new Point(0.5, -1),
+                new Point(0, 0),
             }
             );
         }
         private Polygon createInverseTriangleOrder3()
         {
             return new Polygon(
-                new List<MyPoint> {
-                new MyPoint(0.5, -1),
-                new MyPoint(0, 0),
-                new MyPoint(1, 0),
+                new List<Point> {
+                new Point(0.5, -1),
+                new Point(0, 0),
+                new Point(1, 0),
             }
             );
+        }
+
+        ColorTranslation createDefaultColorTranslation(double lineHeight)
+        {
+            var ct = new ColorTranslation();
+            ct.LineHeight = lineHeight;
+            return ct;
         }
     }
 }

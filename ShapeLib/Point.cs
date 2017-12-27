@@ -2,7 +2,7 @@
 
 namespace ShapeLib
 {
-	public class MyPoint
+	public class Point
 	{
         public double XOriginal
         {
@@ -24,7 +24,7 @@ namespace ShapeLib
 
         private readonly double[] transformation;
 
-        public MyPoint (double x, double y, double[] transformation = null)
+        public Point (double x, double y, double[] transformation = null)
 		{
 			this.XOriginal = x;
 			this.YOriginal = y;
@@ -39,18 +39,18 @@ namespace ShapeLib
             }
 		}
 
-		public double Distance (MyPoint p2)
+		public double Distance (Point p2)
 		{
 			return Math.Sqrt(Math.Pow(this.X-p2.X, 2) + Math.Pow(this.Y-p2.Y, 2));
 		}
 
-        public MyPoint Rotate(double degrees) 
+        public Point Rotate(double degrees) 
         {
             var rad = degrees * Math.PI / 180;
             var newx = this.X * Math.Cos(rad) + this.Y * Math.Sin(rad);
             var newY = -this.X * Math.Sin(rad) + this.Y * Math.Cos(rad);
 
-            return new MyPoint(newx, newY);
+            return new Point(newx, newY);
         }
 
         private double TransformX()
@@ -89,9 +89,9 @@ namespace ShapeLib
 
         public override bool Equals(object obj)
         {
-            if (obj is MyPoint)
+            if (obj is Point)
             {
-                var p2 = obj as MyPoint;
+                var p2 = obj as Point;
                 return p2.X == this.X && p2.Y == this.Y;
             }
             else

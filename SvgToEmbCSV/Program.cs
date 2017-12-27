@@ -55,16 +55,15 @@ namespace SvgToEmbCSV
 
             colortranslations = colortranslations.Count == 0 ? defaultMap : colortranslations;
 
-            foreach (var poly in new SvgReader(r).Read())
-            {
-                foreach (string s in WritePolygonToCsVWithTranslations(colortranslations)(poly))
-                {
-                    Console.WriteLine(s);
-                }
-            }
+            var polygonList = new SvgReader(r).Read();
 
-            Console.WriteLine(CsvStepWriter.WriteClosingSequence());
+            var steps = StepWriter.WriteStitches(colortranslations, polygonList);
+            foreach (var step in steps)
+            {
+                Console.WriteLine(step);
+            }
         }
+
 
         static IEnumerable<string> TryReadLines(string filename)
         {
@@ -80,30 +79,6 @@ namespace SvgToEmbCSV
             return enumerable;
         }
 
-        static Func<Polygon, IEnumerable<string>> WritePolygonToCsVWithTranslations(List<ColorTranslation> colortranslations) 
-            => poly 
-            => WritePolygon(poly, colortranslations);
-
-        static IEnumerable<string> WritePolygon(Polygon poly, List<ColorTranslation> colortranslations)
-        {
-            var colortranslation = colortranslations
-                .Where(ct => ct.Color == poly.Color)
-                .DefaultIfEmpty(ColorTranslation.Default)
-                .First();
-            
-            IStepper s = new AngleStepper(
-                poly, 
-                colortranslation.StepAngle, 
-                colortranslation.LineHeight, 
-                colortranslation.MaxStepLength, 
-                colortranslation.MoveInside);
-
-            var stepsOrig = s.CalculateSteps();
-            var steps = stepsOrig.Select(p => new Step(p.Type, new MyPoint(p.Point.X, p.Point.Y)));
-            foreach (var item in steps)
-            {
-                yield return new CsvStepWriter(item).Write();
-            }
-        }
+       
     }
 }

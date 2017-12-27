@@ -29,7 +29,7 @@ namespace TestPatternCreator
                 {
                     double yPosition = j * (patchSize + patchDistance);
                     double lineHeight = minWidth +  (double)j * (maxWidth - minWidth) / (double)widths;
-                    steps.AddRange(CreatePatch(patchSize, xPosition, yPosition, angle, lineHeight, maxStepLength));
+                    steps.AddRange(CreatePatch(patchSize, xPosition, yPosition, new ColorTranslation { StepAngle = angle, LineHeight = lineHeight, MaxStepLength = maxStepLength}));
                 }
             }
 
@@ -41,16 +41,16 @@ namespace TestPatternCreator
             Console.WriteLine(CsvStepWriter.WriteClosingSequence());
         }
 
-        static IEnumerable<Step> CreatePatch(double patchSize, double xPosition, double yPosition, double angle, double lineHeight, double maxStepLength)
+        static IEnumerable<Step> CreatePatch(double patchSize, double xPosition, double yPosition, ColorTranslation ct)
         {
-            var points = new MyPoint[] { new MyPoint(xPosition, yPosition), 
-                new MyPoint(xPosition + patchSize, yPosition),
-                new MyPoint(xPosition + patchSize, yPosition + patchSize),
-                new MyPoint(xPosition, yPosition + patchSize)};
+            var points = new Point[] { new Point(xPosition, yPosition), 
+                new Point(xPosition + patchSize, yPosition),
+                new Point(xPosition + patchSize, yPosition + patchSize),
+                new Point(xPosition, yPosition + patchSize)};
             
-            Polygon p = new Polygon(points, null);
+            Polygon p = new Polygon(points);
 
-            var s = new AngleStepper(p, angle, lineHeight, maxStepLength);
+            var s = new AngleStepper(p, ct);
             return s.CalculateSteps();
         }
     }

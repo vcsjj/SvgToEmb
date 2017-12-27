@@ -34,7 +34,6 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Polygon.cs" />
-    <Compile Include="MyPoint.cs" />
     <Compile Include="HorizontalStepper.cs" />
     <Compile Include="BoundingBox.cs" />
     <Compile Include="IStepper.cs" />
@@ -43,6 +42,7 @@
     <Compile Include="Fill.cs" />
     <Compile Include="ColorTranslation.cs" />
     <Compile Include="AngleStepper.cs" />
+    <Compile Include="Point.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

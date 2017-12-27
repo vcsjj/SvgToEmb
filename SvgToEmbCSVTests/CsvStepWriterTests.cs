@@ -67,12 +67,12 @@ namespace SvgToEmbCSVTests
 
         private Step CreateOtherStitchStep() 
         {
-            return new Step(Step.StepType.Stitch, new MyPoint(-4.567, 33.1));
+            return new Step(Step.StepType.Stitch, new Point(-4.567, 33.1));
         }
 
         private Step CreateStitchStep() 
         {
-            return new Step(Step.StepType.Stitch, new MyPoint(1, 2));
+            return new Step(Step.StepType.Stitch, new Point(1, 2));
         }
     }
 }

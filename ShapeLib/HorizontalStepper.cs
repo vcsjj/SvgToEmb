@@ -7,38 +7,34 @@ namespace ShapeLib
     public class HorizontalStepper : IStepper
     {
         private readonly Polygon p;
-        private readonly double lineHeight;
-        private readonly double maxStepLength;
-        private readonly double moveInside;
+        private readonly ColorTranslation ct;
 
-        public HorizontalStepper(Polygon p, double lineHeight, double maxStepLength = double.PositiveInfinity, double moveInside = 0.0)
+        public HorizontalStepper(Polygon p, ColorTranslation ct)
         {
             this.p = p;
-            this.lineHeight = lineHeight;
-            this.maxStepLength = maxStepLength;
-            this.moveInside = moveInside;
+            this.ct = ct;
         }
 
 
         public List<Step> CalculateSteps()
         {
-            var polygon = this.p.MoveInside(this.moveInside);
+            var polygon = this.p.MoveInside(this.ct.MoveInside);
 
             var l = new List<Step>();
             var firstVertex = polygon.GetTopLeft();
             var bb = this.p.GetBoundingBox();
             l.Add(new Step(Step.StepType.Trim, firstVertex));
 
-            for (double y = bb.Top-lineHeight; y > bb.Bottom; y -= lineHeight)
+            for (double y = bb.Top-this.ct.LineHeight; y > bb.Bottom; y -= this.ct.LineHeight)
             {
                 List<Step> t = FindIntersections(y, polygon);
                 l.AddRange(t);
             }
 
-            return AddInbetweenStitches(l, this.maxStepLength);
+            return AddInbetweenStitches(l, this.ct.MaxStepLength);
         }
 
-        public static MyPoint FindIntersection(MyPoint fromPoint, MyPoint toPoint, double y)
+        public static Point FindIntersection(Point fromPoint, Point toPoint, double y)
         {
             if (double.IsNaN(y))
                 return null;
@@ -55,11 +51,11 @@ namespace ShapeLib
                 return fromPoint;
 
             if (fromPoint.X == toPoint.X)
-                return new MyPoint(fromPoint.X, y);
+                return new Point(fromPoint.X, y);
 
             double slope = (toPoint.Y - fromPoint.Y) / (toPoint.X - fromPoint.X);
             double offset = fromPoint.Y - fromPoint.X * slope;
-            return new MyPoint((y - offset) / slope, y);
+            return new Point((y - offset) / slope, y);
         }
 
         public static List<Step> FindIntersections(double y, Polygon poly)
@@ -113,7 +109,7 @@ namespace ShapeLib
                     int parts = (int)Math.Ceiling(distance / dMax);
                     for (int p = 1; p <= parts; p++)
                     {
-                        var intermediatePoint = new MyPoint(pre.X + p * (cur.X - pre.X) / parts, pre.Y + p * (cur.Y - pre.Y) / parts);
+                        var intermediatePoint = new Point(pre.X + p * (cur.X - pre.X) / parts, pre.Y + p * (cur.Y - pre.Y) / parts);
                         result.Add(new Step(Step.StepType.Stitch, intermediatePoint));
                     }
                 }

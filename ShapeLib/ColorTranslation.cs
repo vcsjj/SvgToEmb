@@ -2,14 +2,13 @@
 
 namespace ShapeLib
 {
-    public struct ColorTranslation
+    public class ColorTranslation
     {
-        public static ColorTranslation Default = new ColorTranslation {Color = "#000000", StepAngle = 0, LineHeight=0.5, MaxStepLength = 3.0, MoveInside = 0.0};
-        public string Color;
-        public double LineHeight;
-        public double StepAngle;
-        public double MoveInside;
-        public double MaxStepLength;
+        public string Color = "#000000";
+        public double LineHeight = 0.5;
+        public double StepAngle = 0;
+        public double MoveInside = 0.0;
+        public double MaxStepLength = 3.0;
 
         public override string ToString()
         {

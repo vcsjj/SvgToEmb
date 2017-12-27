@@ -12,9 +12,9 @@ namespace ShapeLib
             get;
         }
 
-		private readonly List<MyPoint> vertices = new List<MyPoint>();
+		private readonly List<Point> vertices = new List<Point>();
 
-		public List<MyPoint> Vertices {
+		public List<Point> Vertices {
 			get {
 				return vertices;
 			}
@@ -23,11 +23,11 @@ namespace ShapeLib
 		public Polygon(int vertices)
 		{
 			for(int i = 0; i < vertices; i++) {
-				this.Vertices.Add(new MyPoint (0, 0));
+				this.Vertices.Add(new Point (0, 0));
 			}
 		} 
 
-        public Polygon(IEnumerable<MyPoint> points, string color = "")
+        public Polygon(IEnumerable<Point> points, string color = "")
 		{
             this.Color = color;
 			foreach (var item in points) 
@@ -36,12 +36,12 @@ namespace ShapeLib
 			}
 		}
 
-        public MyPoint CenterOfMass()
+        public Point CenterOfMass()
         {
             var cX = this.vertices.Select(v => v.X).Sum() / this.vertices.Count;
             var cY = this.vertices.Select(v => v.Y).Sum() / this.vertices.Count;
 
-            return new MyPoint(cX, cY);
+            return new Point(cX, cY);
         }
 
         public Polygon MoveInside(double d)
@@ -59,22 +59,22 @@ namespace ShapeLib
 
         public Polygon Scale(double d)
         {
-            var scaledVertices = new List<MyPoint>();
+            var scaledVertices = new List<Point>();
             var com = this.CenterOfMass();
             foreach (var p in this.vertices)
             {
 
                 double newX = (p.X - com.X) * d + com.X;
                 double newY = (p.Y - com.Y) * d + com.Y;
-                scaledVertices.Add(new MyPoint(newX, newY));
+                scaledVertices.Add(new Point(newX, newY));
             }
 
             return new Polygon(scaledVertices);
         }
 
-        public MyPoint GetTopLeft()
+        public Point GetTopLeft()
         {
-            var v = new List<MyPoint>(this.Vertices);
+            var v = new List<Point>(this.Vertices);
             v.Sort((p1, p2) =>
                 {
                     if(p1.Y > p2.Y) return 1;

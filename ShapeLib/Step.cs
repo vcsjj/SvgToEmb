@@ -21,8 +21,8 @@ namespace ShapeLib
             }
         }
 
-        private readonly MyPoint point;
-        public MyPoint Point
+        private readonly Point point;
+        public Point Point
         {
             get
             {
@@ -31,7 +31,7 @@ namespace ShapeLib
         }
 
 
-        public Step(StepType type, MyPoint p)
+        public Step(StepType type, Point p)
         {
             this.type = type;
             this.point = p;

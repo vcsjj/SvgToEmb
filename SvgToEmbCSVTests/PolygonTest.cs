@@ -2,7 +2,6 @@
 using System;
 using ShapeLib;
 using System.Collections.Generic;
-using System.Windows;
 
 namespace SvgToEmbCSVTests
 {
@@ -20,10 +19,10 @@ namespace SvgToEmbCSVTests
 		public void CanInitFromPoints()
 		{
 			Polygon p = new Polygon(
-				new List<MyPoint> {
-					new MyPoint(1,2),
-					new MyPoint(2,2),
-					new MyPoint(3,4)
+				new List<Point> {
+					new Point(1,2),
+					new Point(2,2),
+					new Point(3,4)
 				}
 			);
 
@@ -34,15 +33,15 @@ namespace SvgToEmbCSVTests
         public void IdentifiesTopLeftPoint1()
         {
             Polygon p = new Polygon(
-                new List<MyPoint> {
-                new MyPoint(0, 1),
-                new MyPoint(1, 1),
-                new MyPoint(1, 0),
-                new MyPoint(0, 0),
+                new List<Point> {
+                new Point(0, 1),
+                new Point(1, 1),
+                new Point(1, 0),
+                new Point(0, 0),
             }
             );
 
-            MyPoint tl = p.GetTopLeft();
+            Point tl = p.GetTopLeft();
 
             Assert.AreEqual(tl.X, 0);
             Assert.AreEqual(tl.Y, 1);
@@ -52,15 +51,15 @@ namespace SvgToEmbCSVTests
         public void IdentifiesTopLeftPoint2()
         {
             Polygon p = new Polygon(
-                new List<MyPoint> {
-                new MyPoint(1, 0),
-                new MyPoint(1, 1),
-                new MyPoint(0, 0),
-                new MyPoint(0, 1),
+                new List<Point> {
+                new Point(1, 0),
+                new Point(1, 1),
+                new Point(0, 0),
+                new Point(0, 1),
             }
             );
 
-            MyPoint tl = p.GetTopLeft();
+            Point tl = p.GetTopLeft();
 
             Assert.AreEqual(tl.X, 0);
             Assert.AreEqual(tl.Y, 1);
@@ -70,14 +69,14 @@ namespace SvgToEmbCSVTests
         public void IdentifiesTopLeftPoint3()
         {
             Polygon p = new Polygon(
-                new List<MyPoint> {
-                new MyPoint(0, 1),
-                new MyPoint(-1, 0),
-                new MyPoint(1, 0),
+                new List<Point> {
+                new Point(0, 1),
+                new Point(-1, 0),
+                new Point(1, 0),
             }
             );
 
-            MyPoint tl = p.GetTopLeft();
+            Point tl = p.GetTopLeft();
 
             Assert.AreEqual(tl.X, 0);
             Assert.AreEqual(tl.Y, 1);
@@ -87,14 +86,14 @@ namespace SvgToEmbCSVTests
         public void IdentifiesTopLeftPoint4()
         {
             Polygon p = new Polygon(
-                new List<MyPoint> {
-                new MyPoint(1, 1),
-                new MyPoint(-1, 0),
-                new MyPoint(1, 0),
+                new List<Point> {
+                new Point(1, 1),
+                new Point(-1, 0),
+                new Point(1, 0),
             }
             );
 
-            MyPoint tl = p.GetTopLeft();
+            Point tl = p.GetTopLeft();
 
             Assert.AreEqual(tl.X, 1);
             Assert.AreEqual(tl.Y, 1);
@@ -104,11 +103,11 @@ namespace SvgToEmbCSVTests
         public void BoundingBoxIdenticalWithPolygonIfIsRectangle()
         {
             Polygon p = new Polygon(
-                new List<MyPoint> {
-                new MyPoint(0, 0),
-                new MyPoint(0, 1),
-                new MyPoint(1, 1),
-                new MyPoint(1, 0),
+                new List<Point> {
+                new Point(0, 0),
+                new Point(0, 1),
+                new Point(1, 1),
+                new Point(1, 0),
             }
             );
 
@@ -125,10 +124,10 @@ namespace SvgToEmbCSVTests
         public void BoundingBoxCorrectForTriangle()
         {
             Polygon p = new Polygon(
-                new List<MyPoint> {
-                new MyPoint(0, 0),
-                new MyPoint(0.8, 1),
-                new MyPoint(1, 1),
+                new List<Point> {
+                new Point(0, 0),
+                new Point(0.8, 1),
+                new Point(1, 1),
             }
             );
 
@@ -144,15 +143,15 @@ namespace SvgToEmbCSVTests
         public void CenterOfMassIsZeroForSimplePolygon()
         {
             Polygon p = new Polygon(
-                new List<MyPoint> {
-                new MyPoint(-1, 1),
-                new MyPoint(-1, -1),
-                new MyPoint(1, -1),
-                new MyPoint(1, 1),
+                new List<Point> {
+                new Point(-1, 1),
+                new Point(-1, -1),
+                new Point(1, -1),
+                new Point(1, 1),
             }
             );
 
-            MyPoint com = p.CenterOfMass();
+            Point com = p.CenterOfMass();
             Assert.AreEqual(0, com.X);
             Assert.AreEqual(0, com.Y);
         }
@@ -161,15 +160,15 @@ namespace SvgToEmbCSVTests
         public void CenterOfMassIsZeroForSimplePolygon2()
         {
             Polygon p = new Polygon(
-                new List<MyPoint> {
-                new MyPoint(0, 1),
-                new MyPoint(0, 0),
-                new MyPoint(2, 0),
-                new MyPoint(2, 1),
+                new List<Point> {
+                new Point(0, 1),
+                new Point(0, 0),
+                new Point(2, 0),
+                new Point(2, 1),
             }
             );
 
-            MyPoint com = p.CenterOfMass();
+            Point com = p.CenterOfMass();
             Assert.AreEqual(1, com.X);
             Assert.AreEqual(0.5, com.Y);
         }
@@ -178,10 +177,10 @@ namespace SvgToEmbCSVTests
         public void ShrinkKeepsCenterOfMassConstant()
         {
             Polygon p = new Polygon(
-                new List<MyPoint> {
-                new MyPoint(0, 0),
-                new MyPoint(0.8, 1),
-                new MyPoint(1, 1),
+                new List<Point> {
+                new Point(0, 0),
+                new Point(0.8, 1),
+                new Point(1, 1),
             }
             );
             var oldCenter = p.CenterOfMass();
@@ -197,11 +196,11 @@ namespace SvgToEmbCSVTests
         public void ShrinkKeepsCenterOfMassConstant2()
         {
             Polygon p = new Polygon(
-                new List<MyPoint> {
-                new MyPoint(-2, -2),
-                new MyPoint(-2, 2),
-                new MyPoint(2, 2),
-                new MyPoint(2, -2),
+                new List<Point> {
+                new Point(-2, -2),
+                new Point(-2, 2),
+                new Point(2, 2),
+                new Point(2, -2),
             }
             );
             var oldCenter = p.CenterOfMass();
@@ -217,10 +216,10 @@ namespace SvgToEmbCSVTests
         public void ShrinkReducesDistanceOfVertices()
         {
             Polygon p = new Polygon(
-                new List<MyPoint> {
-                new MyPoint(0, 0),
-                new MyPoint(0.8, 1),
-                new MyPoint(1, 1),
+                new List<Point> {
+                new Point(0, 0),
+                new Point(0.8, 1),
+                new Point(1, 1),
             }
             );
             double oldDistance = p.Vertices[0].Distance(p.Vertices[1]);
