@@ -6,23 +6,23 @@ namespace ShapeLib
 {
     public class HorizontalStepper : Stepper
     {
-        private readonly Polygon p;
+        private readonly Polygon polygon;
         private readonly ColorTranslation ct;
         private bool hasOutline = false;
 
         public HorizontalStepper(Polygon p, ColorTranslation ct)
         {
-            this.p = p;
+            this.polygon = p;
             this.ct = ct;
         }
 
         public override List<Step> CalculateFillSteps()
         {
-            var polygon = this.p.MoveInside(this.ct.MoveInside);
+            var polygon = this.polygon.MoveInside(this.ct.MoveInside);
 
             var l = new List<Step>();
             var firstVertex = polygon.Vertices[0];
-            var bb = this.p.GetBoundingBox();
+            var bb = this.polygon.GetBoundingBox();
             l.Add(new Step(this.hasOutline ? Step.StepType.Stitch : Step.StepType.Jump, firstVertex));
 
             for (double y = bb.Top - this.ct.LineHeight; y > bb.Bottom; y -= this.ct.LineHeight)
@@ -37,11 +37,13 @@ namespace ShapeLib
         public override List<Step> CalculateOutlineSteps()
         {
             this.hasOutline = true;
-            List<Step> steps = this.p.Vertices
+            var reducedPolygon = this.polygon.MoveInside(this.ct.MoveInside);
+            List<Step> steps = reducedPolygon
+                                   .Vertices
                                    .Select(vertex => new Step(Step.StepType.Stitch, vertex))
                                    .ToList();
-            
-            steps.Add(new Step(Step.StepType.Jump, this.p.Vertices[0]));
+
+            steps.Add(new Step(Step.StepType.Jump, reducedPolygon.Vertices[0]));
             return new StepLengthTransformer(steps, this.ct.MaxStepLength).AddInbetweenStitches();
         }
 

@@ -14,15 +14,21 @@ namespace ShapeLib
             get;
         }
 
+        public string Stroke
+        {
+            get;
+        }
+
 		public List<Point> Vertices {
 			get {
 				return vertices;
 			}
 		}
 
-        public Polygon(IEnumerable<Point> points, string color = "")
+        public Polygon(IEnumerable<Point> points, string color = "", string stroke = "")
 		{
             this.Color = color;
+            this.Stroke = stroke;
             this.vertices = this.moveTopLeftToFirstIndex(points.ToList());
 		}
 

@@ -27,13 +27,27 @@ namespace SvgToEmbCSV
 
         private static IEnumerable<string> WriteStitchesForOnePolygon(Polygon poly, List<ColorTranslation> colortranslations)
         {
-            var matchingColortranslations = FindMatchingColorTranslationsOrDefault(poly.Color, colortranslations);
+            var matchingStrokeTranslations = FindMatchingStrokeTranslationsOrDefault(poly.Stroke, colortranslations);
 
-            foreach (var colortranslation in matchingColortranslations) 
+            foreach (var colortranslation in matchingStrokeTranslations) 
             {
                 IStepper s = new AngleStepper(poly, colortranslation);
 
-                var stepsOrig = s.CalculateAllSteps();
+                var stepsOrig = s.CalculateOutlineSteps();
+                var steps = stepsOrig.Select(p => new Step(p.Type, new Point(p.Point.X, p.Point.Y)));
+                foreach (var item in steps)
+                {
+                    yield return new CsvStepWriter(item).Write();
+                }
+            }
+
+            var matchingFillTranslations = FindMatchingFillTranslationsOrDefault(poly.Color, colortranslations);
+
+            foreach (var colortranslation in matchingFillTranslations) 
+            {
+                IStepper s = new AngleStepper(poly, colortranslation);
+
+                var stepsOrig = s.CalculateFillSteps();
                 var steps = stepsOrig.Select(p => new Step(p.Type, new Point(p.Point.X, p.Point.Y)));
                 foreach (var item in steps)
                 {
@@ -42,9 +56,14 @@ namespace SvgToEmbCSV
             }
         }
 
-        static IEnumerable<ColorTranslation> FindMatchingColorTranslationsOrDefault(string color, List<ColorTranslation> colortranslations)
+        static IEnumerable<ColorTranslation> FindMatchingFillTranslationsOrDefault(string color, List<ColorTranslation> colortranslations)
         {
             return colortranslations.Where(ct => ct.Color == color).DefaultIfEmpty(new ColorTranslation());
+        }
+
+        static IEnumerable<ColorTranslation> FindMatchingStrokeTranslationsOrDefault(string color, List<ColorTranslation> colortranslations)
+        {
+            return colortranslations.Where(ct => ct.Color == color);
         }
     }
 }

@@ -107,8 +107,6 @@ namespace SvgToEmbCSVTests
             Assert.AreEqual("#bcdaa0", lp.First().Color);
         }
 
-
-
         [Test()]
         public void OneColorIsFound()
         {
@@ -119,10 +117,11 @@ namespace SvgToEmbCSVTests
             );
 
             var reader = new SvgReader(source);
-            List<string> colors = reader.Colors();
+            List<string> colors = reader.Colors().Where(s => s.StartsWith("#")).ToList();
             Assert.AreEqual(1, colors.Count);
             Assert.AreEqual("#bbbbcc", colors[0]);
         }
+
         [Test()]
         public void TwoSameColorsAreFoundOnlyOnce()
         {
@@ -134,7 +133,7 @@ namespace SvgToEmbCSVTests
             );
 
             var reader = new SvgReader(source);
-            List<string> colors = reader.Colors();
+            List<string> colors = reader.Colors().Where(s => s.StartsWith("#")).ToList();
             Assert.AreEqual(1, colors.Count);
             Assert.AreEqual("#bbbbcc", colors[0]);
         }
@@ -150,7 +149,7 @@ namespace SvgToEmbCSVTests
             );
 
             var reader = new SvgReader(source);
-            List<string> colors = reader.Colors();
+            List<string> colors = reader.Colors().Where(s => s.StartsWith("#")).ToList();
             Assert.AreEqual(2, colors.Count);
             Assert.AreEqual("#bbbbcc", colors[0]);
             Assert.AreEqual("#aabbcc", colors[1]);
@@ -170,11 +169,26 @@ namespace SvgToEmbCSVTests
             );
 
             var reader = new SvgReader(source);
-            List<string> colors = reader.Colors();
+            List<string> colors = reader.Colors().Where(s => s.StartsWith("#")).ToList();
             Assert.AreEqual(3, colors.Count);
             Assert.AreEqual("#aabbdd", colors[0]);
             Assert.AreEqual("#bbbbcc", colors[1]);
             Assert.AreEqual("#aabbcc", colors[2]);
+        }
+
+        [Test()]
+        public void OneStrokeIsFound()
+        {
+            var source = System.Xml.Linq.XElement.Parse(
+                "<svg>"
+                + "<polygon\n     points=\"1,2 3,4 5,6 \" style=\"fill:#bbbbcc;stroke:#00aaff;stroke-width:1\"/>"
+                + "</svg>"
+            );
+
+            var reader = new SvgReader(source);
+            List<string> strokes = reader.Colors().Where(s => s.StartsWith("stroke")).ToList();
+            Assert.AreEqual(1, strokes.Count);
+            Assert.AreEqual("stroke:#00aaff", strokes[0]);
         }
     }
 }

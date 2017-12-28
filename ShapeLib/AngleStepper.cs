@@ -43,6 +43,7 @@ namespace ShapeLib
                 var rotated = p.Rotate(this.ct.StepAngle);
                 rList.Add(rotated);
             }
+
             Polygon p2 = new Polygon(rList);
             return p2;
         }

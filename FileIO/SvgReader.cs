@@ -9,6 +9,7 @@ namespace FileIO
     public class SvgReader
     {
         private const string defaultColor = "#000000";
+        private const string defaultStroke = "";
         private readonly System.Xml.Linq.XElement source;
       
         public SvgReader(System.Xml.Linq.XElement xElement)
@@ -35,14 +36,8 @@ namespace FileIO
             {
                 if (l1.Name.LocalName == "polygon")
                 {
-                    var p = ExtractFill(l1);
-                    if (p != null)
-                    {
-                        if (!lc.Contains(p))
-                        {
-                            lc.Add(p);
-                        }
-                    }
+                    AddFillIfAny(l1, ref lc);
+                    AddStrokeIfAny(l1, ref lc);
                 }
                 else
                 {
@@ -51,6 +46,30 @@ namespace FileIO
             }
 
             return lc;
+        }
+
+        void AddFillIfAny(XElement l1, ref List<string> lc)
+        {
+            var p = ExtractFill(l1);
+            if (p != null)
+            {
+                if (!lc.Contains(p))
+                {
+                    lc.Add(p);
+                }
+            }
+        }
+
+        void AddStrokeIfAny(XElement l1, ref List<string> lc)
+        {
+            var stroke = ExtractStroke(l1);
+            if (stroke != null)
+            {
+                if (!lc.Contains(stroke))
+                {
+                    lc.Add(stroke);
+                }
+            }
         }
 
         List<Polygon> ReadElements(IEnumerable<XElement> elements)
@@ -81,7 +100,18 @@ namespace FileIO
             string styleString = l1.Attribute("style")?.Value;
             if (styleString != null)
             {
-                return styleString.Split(';').Where(s => s.StartsWith("fill")).Select(s => s.Substring(5)).First();
+                return styleString.Split(';').Where(s => s.StartsWith("fill")).DefaultIfEmpty(string.Empty).Select(s => s.Substring(5)).First();
+            }
+
+            return string.Empty;
+        }
+
+        string ExtractStroke(XElement l1)
+        {
+            string styleString = l1.Attribute("style")?.Value;
+            if (styleString != null)
+            {
+                return styleString.Split(';').Where(s => s.StartsWith("stroke")).DefaultIfEmpty(string.Empty).First();
             }
 
             return string.Empty;
@@ -93,6 +123,12 @@ namespace FileIO
                 .StartsWith("fill:"))
             ?.Substring(5) ?? defaultColor;
 
+        static string StrokeFromStyle(string styleString) => styleString?.Split(';')
+            .DefaultIfEmpty("stroke:" + defaultColor)
+            .First(s => s.ToLower()
+                .StartsWith("stroke:"))
+            ?? defaultStroke;
+
         Polygon ExtractPolygon(XElement l1)
         {
             var culture = System.Globalization.CultureInfo.InvariantCulture;
@@ -103,6 +139,7 @@ namespace FileIO
             string transformationString = l1.Attribute("transform")?.Value;
 
             string color = ColorFromStyle(styleString);
+            string stroke = StrokeFromStyle(styleString);
             
             double[] transformation = new double[] {
                 1,
@@ -130,7 +167,7 @@ namespace FileIO
                         l.Add(new Point(x, y, transformation));
                     }
                 }
-                ret = new Polygon(l, color);
+                ret = new Polygon(l, color, stroke);
             }
 
             return ret;
