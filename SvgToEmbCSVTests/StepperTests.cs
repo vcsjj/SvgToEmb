@@ -2,11 +2,12 @@
 using System;
 using ShapeLib;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SvgToEmbCSVTests
 {
     [TestFixture()]
-    public class StepperTests
+    public class StepperTests : StepperTestsBase
     {
         Polygon polygon;
         ColorTranslation colorTranslation;
@@ -19,7 +20,7 @@ namespace SvgToEmbCSVTests
             this.polygon = this.createDefaultPolygon();
             this.triangle = this.createTriangle();
             this.inverseTriangle = this.createInverseTriangle();
-            this.colorTranslation = this.createDefaultColorTranslation(1.0);
+            this.colorTranslation = this.createDefaultColorTranslation(0.1);
         }
 
         [Test()]
@@ -28,7 +29,7 @@ namespace SvgToEmbCSVTests
 
             HorizontalStepper hs = new HorizontalStepper(this.polygon, this.colorTranslation);
 
-            List<Step> steps = hs.CalculateSteps();
+            List<Step> steps = hs.CalculateFillSteps();
 
             bool isRepeated = false;
             var set = new HashSet<Tuple<double,double>>();
@@ -48,9 +49,9 @@ namespace SvgToEmbCSVTests
         public void FirstPointIsIdenticalWithUpperLeftCorner()
         {
             HorizontalStepper hs = new HorizontalStepper(this.polygon, this.colorTranslation);
-            List<Step> steps = hs.CalculateSteps();
+            List<Step> steps = hs.CalculateFillSteps();
 
-            Assert.AreEqual(this.polygon.GetTopLeft(), steps[0].Point);
+            Assert.AreEqual(this.polygon.Vertices[0], steps[0].Point);
         }
 
         [Test()]
@@ -58,7 +59,7 @@ namespace SvgToEmbCSVTests
         {
             this.colorTranslation.LineHeight = 0.9;
             HorizontalStepper hs = new HorizontalStepper(this.triangle, this.colorTranslation);
-            List<Step> steps = hs.CalculateSteps();
+            List<Step> steps = hs.CalculateFillSteps();
 
             Assert.AreEqual(3, steps.Count);
         }
@@ -68,7 +69,7 @@ namespace SvgToEmbCSVTests
         {
             this.colorTranslation.LineHeight = 0.45;
             HorizontalStepper hs = new HorizontalStepper(this.triangle, this.colorTranslation);
-            List<Step> steps = hs.CalculateSteps();
+            List<Step> steps = hs.CalculateFillSteps();
 
             Assert.AreEqual(5, steps.Count);
         }
@@ -78,7 +79,7 @@ namespace SvgToEmbCSVTests
         {
             this.colorTranslation.LineHeight = 0.9;
             HorizontalStepper hs = new HorizontalStepper(this.inverseTriangle, this.colorTranslation);
-            List<Step> steps = hs.CalculateSteps();
+            List<Step> steps = hs.CalculateFillSteps();
 
             Assert.AreEqual(3, steps.Count);
         }
@@ -88,7 +89,7 @@ namespace SvgToEmbCSVTests
         {
             this.colorTranslation.LineHeight = 0.45;
             HorizontalStepper hs = new HorizontalStepper(this.inverseTriangle, this.colorTranslation);
-            List<Step> steps = hs.CalculateSteps();
+            List<Step> steps = hs.CalculateFillSteps();
 
             Assert.AreEqual(5, steps.Count);
         }
@@ -174,52 +175,32 @@ namespace SvgToEmbCSVTests
             Assert.IsTrue(first.X <= second.X);
         }
 
+
+
         [Test()]
-        public void AdditionalStepsAreAddedIfDistanceIsTooBigY()
+        public void FillStartsWithOutline()
         {
-            List<Step> l = new List<Step>
-            {
-                new Step(Step.StepType.Stitch, new Point(0.0, 0.0)),
-                new Step(Step.StepType.Stitch, new Point(0.0, 10.0))
-            };
-
-            List<Step> filledList = HorizontalStepper.AddInbetweenStitches(l, 5.0);
-            Assert.AreEqual(3, filledList.Count);
-            Assert.AreEqual(0.0, filledList[0].Point.Y);
-            Assert.AreEqual(5.0, filledList[1].Point.Y);
-            Assert.AreEqual(10.0, filledList[2].Point.Y);
-
+            HorizontalStepper h = new HorizontalStepper(this.polygon, this.colorTranslation);
+            var fillSteps = h.CalculateFillSteps();
+            var outlineSteps = h.CalculateOutlineSteps();
+            Assert.AreEqual(fillSteps.First().Point, outlineSteps.Last().Point);
         }
 
         [Test()]
-        public void AdditionalStepsAreAddedIfDistanceIsTooBigX()
+        public void OutlineHasAtLeastAsManyStepsAsPolygonHasVertices()
         {
-            List<Step> l = new List<Step>
-                {
-                    new Step(Step.StepType.Stitch, new Point(0.0, 0.0)),
-                    new Step(Step.StepType.Stitch, new Point(1.0, 0.0))
-                };
-
-            List<Step> filledList = HorizontalStepper.AddInbetweenStitches(l, 0.5);
-
-
-            Assert.AreEqual(0.0, filledList[0].Point.X);
-            Assert.AreEqual(0.5, filledList[1].Point.X);
-            Assert.AreEqual(1.0, filledList[2].Point.X);
+            HorizontalStepper h = new HorizontalStepper(this.polygon, this.colorTranslation);
+            var outlineSteps = h.CalculateOutlineSteps();
+            Assert.IsTrue(outlineSteps.Count >= this.polygon.Vertices.Count + 1);
         }
 
         [Test()]
-        public void AdditionalStepsAreAddedIfDistanceIsTooBig2()
+        public void OutlineHasMoreStepsThanPolygonHasVerticesForSmallSteplength()
         {
-            List<Step> l = new List<Step>
-                {
-                    new Step(Step.StepType.Stitch, new Point(0.0, 0.0)),
-                    new Step(Step.StepType.Stitch, new Point(0.0, 9.0))
-                };
-
-            List<Step> filledList = HorizontalStepper.AddInbetweenStitches(l, 5.0);
-
-            Assert.AreEqual(3, filledList.Count);
+            this.colorTranslation.MaxStepLength = this.polygon.Vertices[0].Distance(this.polygon.Vertices[1])/2;
+            HorizontalStepper h = new HorizontalStepper(this.polygon, this.colorTranslation);
+            var outlineSteps = h.CalculateOutlineSteps();
+            Assert.IsTrue(outlineSteps.Count > this.polygon.Vertices.Count + 1);
         }
 
         private static void CreateLinePoints(out Point p1, out Point p2)
@@ -228,17 +209,7 @@ namespace SvgToEmbCSVTests
             p2 = new Point(3, 4);
         }
 
-        protected Polygon createDefaultPolygon()
-        {
-            return new Polygon(
-                new List<Point> {
-                new Point(0, 0),
-                new Point(0, 1),
-                new Point(1, 1),
-                new Point(1, 0),
-            }
-            );
-        }
+
 
         private Polygon createTriangle()
         {

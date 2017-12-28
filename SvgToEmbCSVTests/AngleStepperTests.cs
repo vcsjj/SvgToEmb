@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace SvgToEmbCSVTests
 {
     [TestFixture()]
-    public class AngleStepperTests : StepperTests
+    public class AngleStepperTests : StepperTestsBase
     {
         [Test()]
         public void Angle0IsIdenticalWithHorizontal()
@@ -19,8 +19,8 @@ namespace SvgToEmbCSVTests
             AngleStepper a = new AngleStepper(p, ct);
 
 
-            List<Step> stepsHorizontal = hs.CalculateSteps();
-            List<Step> stepsAngle = a.CalculateSteps();
+            List<Step> stepsHorizontal = hs.CalculateFillSteps();
+            List<Step> stepsAngle = a.CalculateFillSteps();
 
             CollectionAssert.AreEqual(stepsHorizontal, stepsAngle);
         }
@@ -39,8 +39,8 @@ namespace SvgToEmbCSVTests
             HorizontalStepper hs = new HorizontalStepper(p, ct);
             AngleStepper a = new AngleStepper(p, ct2);
 
-            List<Step> stepsHorizontal = hs.CalculateSteps();
-            List<Step> stepsAngle = a.CalculateSteps();
+            List<Step> stepsHorizontal = hs.CalculateFillSteps();
+            List<Step> stepsAngle = a.CalculateFillSteps();
 
             CollectionAssert.AreNotEqual(stepsHorizontal, stepsAngle);
         }

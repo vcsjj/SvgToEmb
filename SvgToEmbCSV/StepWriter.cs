@@ -33,7 +33,7 @@ namespace SvgToEmbCSV
             {
                 IStepper s = new AngleStepper(poly, colortranslation);
 
-                var stepsOrig = s.CalculateSteps();
+                var stepsOrig = s.CalculateAllSteps();
                 var steps = stepsOrig.Select(p => new Step(p.Type, new Point(p.Point.X, p.Point.Y)));
                 foreach (var item in steps)
                 {

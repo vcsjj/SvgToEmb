@@ -3,10 +3,11 @@ using System.Collections.Generic;
 
 namespace ShapeLib
 {
-    public class AngleStepper : IStepper
+    public class AngleStepper : Stepper
     {
         private readonly ColorTranslation ct;
         private readonly Polygon p;
+
 
         public AngleStepper(Polygon p, ColorTranslation ct)
         {
@@ -14,7 +15,27 @@ namespace ShapeLib
             this.ct = ct;
         }
 
-        public System.Collections.Generic.List<Step> CalculateSteps()
+        public override List<Step> CalculateFillSteps()
+        {
+            var p2 = RotateForward();
+
+            HorizontalStepper h = new HorizontalStepper(p2, this.ct);
+            var rotatedResult = h.CalculateFillSteps();
+
+            return RotateBackward(rotatedResult);
+        }
+
+        public override List<Step> CalculateOutlineSteps()
+        {
+            var p2 = RotateForward();
+
+            HorizontalStepper h = new HorizontalStepper(p2, this.ct);
+            var rotatedResult = h.CalculateOutlineSteps();
+
+            return RotateBackward(rotatedResult);
+        }
+
+        Polygon RotateForward()
         {
             var rList = new List<Point>();
             foreach (var p in this.p.Vertices)
@@ -22,11 +43,12 @@ namespace ShapeLib
                 var rotated = p.Rotate(this.ct.StepAngle);
                 rList.Add(rotated);
             }
-
             Polygon p2 = new Polygon(rList);
-            HorizontalStepper h = new HorizontalStepper(p2, this.ct);
-            var rotatedResult = h.CalculateSteps();
+            return p2;
+        }
 
+        List<Step> RotateBackward(List<Step> rotatedResult)
+        {
             var result = new List<Step>();
             foreach (var p in rotatedResult)
             {
@@ -36,7 +58,6 @@ namespace ShapeLib
 
             return result;
         }
-
     }
 }
 

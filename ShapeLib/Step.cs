@@ -7,7 +7,7 @@ namespace ShapeLib
         public enum StepType 
         {
             Stitch,
-            Trim
+            Jump
         }
 
         private readonly StepType type;

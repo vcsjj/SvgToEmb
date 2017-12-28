@@ -50,6 +50,9 @@
     <Compile Include="ColorMapReaderTests.cs" />
     <Compile Include="AngleStepperTests.cs" />
     <Compile Include="StepWriterTests.cs" />
+    <Compile Include="StepperTestsBase.cs" />
+    <Compile Include="StepLengthTransformerTests.cs" />
+    <Compile Include="VertexSorterTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

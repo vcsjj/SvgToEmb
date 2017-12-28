@@ -5,7 +5,9 @@ namespace ShapeLib
 {
     public interface IStepper
     {
-        List<Step> CalculateSteps();
+        List<Step> CalculateAllSteps();
+        List<Step> CalculateFillSteps();
+        List<Step> CalculateOutlineSteps();
     }
 }
 

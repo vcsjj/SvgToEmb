@@ -7,12 +7,12 @@ namespace ShapeLib
 {
 	public class Polygon
 	{
+        private readonly List<Point> vertices;
+
         public string Color
         {
             get;
         }
-
-		private readonly List<Point> vertices = new List<Point>();
 
 		public List<Point> Vertices {
 			get {
@@ -20,20 +20,10 @@ namespace ShapeLib
 			}
 		}
 
-		public Polygon(int vertices)
-		{
-			for(int i = 0; i < vertices; i++) {
-				this.Vertices.Add(new Point (0, 0));
-			}
-		} 
-
         public Polygon(IEnumerable<Point> points, string color = "")
 		{
             this.Color = color;
-			foreach (var item in points) 
-			{
-				this.Vertices.Add (item);
-			}
+            this.vertices = this.moveTopLeftToFirstIndex(points.ToList());
 		}
 
         public Point CenterOfMass()
@@ -72,23 +62,6 @@ namespace ShapeLib
             return new Polygon(scaledVertices);
         }
 
-        public Point GetTopLeft()
-        {
-            var v = new List<Point>(this.Vertices);
-            v.Sort((p1, p2) =>
-                {
-                    if(p1.Y > p2.Y) return 1;
-                    else if (p1.Y < p2.Y) return -1;
-                    else 
-                    {
-                        if(p1.X < p2.X) return 1;
-                        else if (p1.X > p2.X) return -1;
-                        else return 0;
-                    }
-                });
-            return v.Last();
-        }
-
         public BoundingBox GetBoundingBox()
         {
             double minX = this.Vertices.OrderBy(p => p.X).First().X;
@@ -97,6 +70,21 @@ namespace ShapeLib
             double maxY = this.Vertices.OrderBy(p => -p.Y).First().Y;
 
             return new BoundingBox(minX, minY, maxX - minX, maxY - minY);
+        }
+
+        private List<Point> moveTopLeftToFirstIndex(List<Point> points)
+        {
+            int tli = VertexSorter.GetTopLeftIndex(points);
+            if (tli == 0)
+                return points;
+
+            var shifted = new List<Point>();
+            for (int i = 0; i < points.Count; i++)
+            {
+                shifted.Add(points[(i + tli) % points.Count]); 
+            }
+
+            return shifted;
         }
 	}
 }

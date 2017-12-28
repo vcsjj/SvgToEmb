@@ -4,10 +4,11 @@ using System.Linq;
 
 namespace ShapeLib
 {
-    public class HorizontalStepper : IStepper
+    public class HorizontalStepper : Stepper
     {
         private readonly Polygon p;
         private readonly ColorTranslation ct;
+        private bool hasOutline = false;
 
         public HorizontalStepper(Polygon p, ColorTranslation ct)
         {
@@ -15,23 +16,33 @@ namespace ShapeLib
             this.ct = ct;
         }
 
-
-        public List<Step> CalculateSteps()
+        public override List<Step> CalculateFillSteps()
         {
             var polygon = this.p.MoveInside(this.ct.MoveInside);
 
             var l = new List<Step>();
-            var firstVertex = polygon.GetTopLeft();
+            var firstVertex = polygon.Vertices[0];
             var bb = this.p.GetBoundingBox();
-            l.Add(new Step(Step.StepType.Trim, firstVertex));
+            l.Add(new Step(this.hasOutline ? Step.StepType.Stitch : Step.StepType.Jump, firstVertex));
 
-            for (double y = bb.Top-this.ct.LineHeight; y > bb.Bottom; y -= this.ct.LineHeight)
+            for (double y = bb.Top - this.ct.LineHeight; y > bb.Bottom; y -= this.ct.LineHeight)
             {
                 List<Step> t = FindIntersections(y, polygon);
                 l.AddRange(t);
             }
 
-            return AddInbetweenStitches(l, this.ct.MaxStepLength);
+            return new StepLengthTransformer(l, this.ct.MaxStepLength).AddInbetweenStitches();
+        }
+
+        public override List<Step> CalculateOutlineSteps()
+        {
+            this.hasOutline = true;
+            List<Step> steps = this.p.Vertices
+                                   .Select(vertex => new Step(Step.StepType.Stitch, vertex))
+                                   .ToList();
+            
+            steps.Add(new Step(Step.StepType.Jump, this.p.Vertices[0]));
+            return new StepLengthTransformer(steps, this.ct.MaxStepLength).AddInbetweenStitches();
         }
 
         public static Point FindIntersection(Point fromPoint, Point toPoint, double y)
@@ -88,39 +99,7 @@ namespace ShapeLib
             return sortedByX;
         }
 
-        public static List<Step> AddInbetweenStitches(List<Step> l, double dMax)
-        {
-            
-            var result = new List<Step>();
-            if(l.Count == 0) 
-                return result;
-            
-            result.Add(l[0]);
-            for (int i = 1; i < l.Count; i++)
-            {
-                var pre = l[i - 1];
-                var cur = l[i];
 
-                var distance = cur.Point.Distance(pre.Point);
-                if (distance > dMax)
-                {
-                    
-
-                    int parts = (int)Math.Ceiling(distance / dMax);
-                    for (int p = 1; p <= parts; p++)
-                    {
-                        var intermediatePoint = new Point(pre.X + p * (cur.X - pre.X) / parts, pre.Y + p * (cur.Y - pre.Y) / parts);
-                        result.Add(new Step(Step.StepType.Stitch, intermediatePoint));
-                    }
-                }
-                else
-                {
-                    result.Add(cur);
-                }
-            }
-
-            return result;
-        }
     }
 }
 

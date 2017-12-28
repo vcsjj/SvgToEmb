@@ -51,7 +51,7 @@ namespace TestPatternCreator
             Polygon p = new Polygon(points);
 
             var s = new AngleStepper(p, ct);
-            return s.CalculateSteps();
+            return s.CalculateFillSteps();
         }
     }
 }
