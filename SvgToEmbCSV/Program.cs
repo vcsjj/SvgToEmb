@@ -36,7 +36,7 @@ namespace SvgToEmbCSV
             Console.WriteLine(ColorTranslation.Header);
 
             var r = XElement.Load(filename); 
-            new SvgReader(r).Colors().ForEach(color => Console.WriteLine(new ColorTranslation {Color = color, StepAngle = 0.0, LineHeight = 0.5, MoveInside = 0.0, MaxStepLength = 3.0}));
+            new SvgReader(r).ReadObjectProperties().ForEach(color => Console.WriteLine(new ColorTranslation {Color = color.Color, StepAngle = 0.0, LineHeight = 0.5, MoveInside = 0.0, MaxStepLength = 3.0}));
         }
 
         static void CreateStitches(string filename, string colormap) 
@@ -55,7 +55,7 @@ namespace SvgToEmbCSV
 
             colortranslations = colortranslations.Count == 0 ? defaultMap : colortranslations;
 
-            var polygonList = new SvgReader(r).Read();
+            var polygonList = new SvgReader(r).ExtractPolygons();
 
             var steps = StepWriter.WriteStitches(colortranslations, polygonList);
             foreach (var step in steps)

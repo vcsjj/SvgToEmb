@@ -38,6 +38,7 @@
     <Compile Include="CsvStepWriter.cs" />
     <Compile Include="ColorMapReader.cs" />
     <Compile Include="SvgReader.cs" />
+    <Compile Include="SvgObjectProperty.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

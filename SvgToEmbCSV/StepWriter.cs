@@ -39,34 +39,6 @@ namespace SvgToEmbCSV
                     yield return new CsvStepWriter(item).Write();
                 }
             }
-//
-//            var matchingStrokeTranslations = FindMatchingStrokeTranslationsOrDefault(poly.Stroke, colortranslations);
-//
-//            foreach (var colortranslation in matchingStrokeTranslations) 
-//            {
-//                IStepper s = new AngleStepper(poly, colortranslation);
-//
-//                var stepsOrig = s.CalculateOutlineSteps();
-//                var steps = stepsOrig.Select(p => new Step(p.Type, new Point(p.Point.X, p.Point.Y)));
-//                foreach (var item in steps)
-//                {
-//                    yield return new CsvStepWriter(item).Write();
-//                }
-//            }
-//
-//            var matchingFillTranslations = FindMatchingFillTranslationsOrDefault(poly.Color, colortranslations);
-//
-//            foreach (var colortranslation in matchingFillTranslations) 
-//            {
-//                IStepper s = new AngleStepper(poly, colortranslation);
-//
-//                var stepsOrig = s.CalculateFillSteps();
-//                var steps = stepsOrig.Select(p => new Step(p.Type, new Point(p.Point.X, p.Point.Y)));
-//                foreach (var item in steps)
-//                {
-//                    yield return new CsvStepWriter(item).Write();
-//                }
-//            }
         }
 
         static IEnumerable<ColorTranslation> FindMatchingTranslationsOrDefault(string color, string stroke, List<ColorTranslation> colortranslations)

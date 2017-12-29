@@ -15,7 +15,7 @@ namespace SvgToEmbCSVTests
         public void EmptyElementHasZeroPolygons()
         {
             var reader = new SvgReader(new System.Xml.Linq.XElement("test"));
-            List<Polygon> lp = reader.Read();
+            List<Polygon> lp = reader.ExtractPolygons();
 
             Assert.AreEqual(0, lp.Count);
         }
@@ -27,7 +27,7 @@ namespace SvgToEmbCSVTests
                                  "  <svg><polygon\n     points=\"1088.95,2511.82 1169.85,2570.6 1138.95,2475.49 1058.05,2416.71 \"  transform=\"matrix(0.05880683,0,0,0.0624649,-51.602926,-159.78388)\" /></svg>"
                              ));
 
-            List<Polygon> lp = reader.Read();
+            List<Polygon> lp = reader.ExtractPolygons();
 
             Assert.AreEqual(1, lp.Count);
         }
@@ -39,7 +39,7 @@ namespace SvgToEmbCSVTests
                 "  <svg><polygon\n     points=\"1088.95,2511.82 1169.85,2570.6 1138.95,2475.49 1058.05,2416.71 \" /></svg>"
             ));
 
-            List<Polygon> lp = reader.Read();
+            List<Polygon> lp = reader.ExtractPolygons();
 
             Assert.IsTrue(lp.Where(poly => poly.Vertices.Where(pt => Math.Abs(pt.X - 1058.05) < 1e-8 && Math.Abs(pt.Y - 2416.71) < 1e-8).Any()).Any());
         }
@@ -53,7 +53,7 @@ namespace SvgToEmbCSVTests
                 + "<polygon\n     points=\"1088.95,2511.82 1169.85,2570.6 1138.95,2475.49 1058.05,2416.71 \"/></svg>"
             ));
 
-            List<Polygon> lp = reader.Read();
+            List<Polygon> lp = reader.ExtractPolygons();
 
             Assert.AreEqual(2, lp.Count);
         }
@@ -70,7 +70,7 @@ namespace SvgToEmbCSVTests
                 + "</svg>"
             ));
 
-            List<Polygon> lp = reader.Read();
+            List<Polygon> lp = reader.ExtractPolygons();
 
             Assert.AreEqual(2, lp.Count);
         }
@@ -86,9 +86,9 @@ namespace SvgToEmbCSVTests
 
             var reader = new SvgReader(source);
 
-            List<Polygon> lp = reader.Read();
+            List<Polygon> lp = reader.ExtractPolygons();
 
-            Assert.AreEqual("#aaaa00", lp.First().Color);
+            Assert.AreEqual("fill:#aaaa00", lp.First().Color);
         }
 
         [Test()]
@@ -102,9 +102,9 @@ namespace SvgToEmbCSVTests
 
             var reader = new SvgReader(source);
 
-            List<Polygon> lp = reader.Read();
+            List<Polygon> lp = reader.ExtractPolygons();
 
-            Assert.AreEqual("#bcdaa0", lp.First().Color);
+            Assert.AreEqual("fill:#bcdaa0", lp.First().Color);
         }
 
         [Test()]
@@ -117,9 +117,9 @@ namespace SvgToEmbCSVTests
             );
 
             var reader = new SvgReader(source);
-            List<string> colors = reader.Colors().Where(s => s.StartsWith("#")).ToList();
-            Assert.AreEqual(1, colors.Count);
-            Assert.AreEqual("#bbbbcc", colors[0]);
+            List<SvgObjectProperty> fills = reader.ReadObjectProperties().Where(s => s.Type == SvgPropertyType.Fill).ToList();
+            Assert.AreEqual(1, fills.Count);
+            Assert.AreEqual("fill:#bbbbcc", fills[0].Color);
         }
 
         [Test()]
@@ -133,9 +133,9 @@ namespace SvgToEmbCSVTests
             );
 
             var reader = new SvgReader(source);
-            List<string> colors = reader.Colors().Where(s => s.StartsWith("#")).ToList();
-            Assert.AreEqual(1, colors.Count);
-            Assert.AreEqual("#bbbbcc", colors[0]);
+            List<SvgObjectProperty> fills = reader.ReadObjectProperties().Where(s => s.Type == SvgPropertyType.Fill).ToList();
+            Assert.AreEqual(1, fills.Count);
+            Assert.AreEqual("fill:#bbbbcc", fills[0].Color);
         }
 
         [Test()]
@@ -149,10 +149,10 @@ namespace SvgToEmbCSVTests
             );
 
             var reader = new SvgReader(source);
-            List<string> colors = reader.Colors().Where(s => s.StartsWith("#")).ToList();
-            Assert.AreEqual(2, colors.Count);
-            Assert.AreEqual("#bbbbcc", colors[0]);
-            Assert.AreEqual("#aabbcc", colors[1]);
+            List<SvgObjectProperty> fills = reader.ReadObjectProperties().Where(s => s.Type == SvgPropertyType.Fill).ToList();
+            Assert.AreEqual(2, fills.Count);
+            Assert.AreEqual("fill:#bbbbcc", fills[0].Color);
+            Assert.AreEqual("fill:#aabbcc", fills[1].Color);
         }
 
         [Test()]
@@ -169,11 +169,11 @@ namespace SvgToEmbCSVTests
             );
 
             var reader = new SvgReader(source);
-            List<string> colors = reader.Colors().Where(s => s.StartsWith("#")).ToList();
-            Assert.AreEqual(3, colors.Count);
-            Assert.AreEqual("#aabbdd", colors[0]);
-            Assert.AreEqual("#bbbbcc", colors[1]);
-            Assert.AreEqual("#aabbcc", colors[2]);
+            List<SvgObjectProperty> fills = reader.ReadObjectProperties().Where(s => s.Type == SvgPropertyType.Fill).ToList();
+            Assert.AreEqual(3, fills.Count);
+            Assert.AreEqual("fill:#aabbdd", fills[0].Color);
+            Assert.AreEqual("fill:#bbbbcc", fills[1].Color);
+            Assert.AreEqual("fill:#aabbcc", fills[2].Color);
         }
 
         [Test()]
@@ -186,9 +186,9 @@ namespace SvgToEmbCSVTests
             );
 
             var reader = new SvgReader(source);
-            List<string> strokes = reader.Colors().Where(s => s.StartsWith("stroke")).ToList();
+            List<SvgObjectProperty> strokes = reader.ReadObjectProperties().Where(s => s.Type == SvgPropertyType.Stroke).ToList();
             Assert.AreEqual(1, strokes.Count);
-            Assert.AreEqual("stroke:#00aaff", strokes[0]);
+            Assert.AreEqual("stroke:#00aaff", strokes[0].Color);
         }
     }
 }
