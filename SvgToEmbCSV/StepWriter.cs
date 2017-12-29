@@ -27,33 +27,51 @@ namespace SvgToEmbCSV
 
         private static IEnumerable<string> WriteStitchesForOnePolygon(Polygon poly, List<ColorTranslation> colortranslations)
         {
-            var matchingStrokeTranslations = FindMatchingStrokeTranslationsOrDefault(poly.Stroke, colortranslations);
-
-            foreach (var colortranslation in matchingStrokeTranslations) 
+            var matchingTranslations = FindMatchingTranslationsOrDefault(poly.Color, poly.Stroke, colortranslations);
+            foreach (var colortranslation in matchingTranslations) 
             {
                 IStepper s = new AngleStepper(poly, colortranslation);
 
-                var stepsOrig = s.CalculateOutlineSteps();
+                var stepsOrig = colortranslation.Color.StartsWith("stroke") ? s.CalculateOutlineSteps() : s.CalculateFillSteps();
                 var steps = stepsOrig.Select(p => new Step(p.Type, new Point(p.Point.X, p.Point.Y)));
                 foreach (var item in steps)
                 {
                     yield return new CsvStepWriter(item).Write();
                 }
             }
+//
+//            var matchingStrokeTranslations = FindMatchingStrokeTranslationsOrDefault(poly.Stroke, colortranslations);
+//
+//            foreach (var colortranslation in matchingStrokeTranslations) 
+//            {
+//                IStepper s = new AngleStepper(poly, colortranslation);
+//
+//                var stepsOrig = s.CalculateOutlineSteps();
+//                var steps = stepsOrig.Select(p => new Step(p.Type, new Point(p.Point.X, p.Point.Y)));
+//                foreach (var item in steps)
+//                {
+//                    yield return new CsvStepWriter(item).Write();
+//                }
+//            }
+//
+//            var matchingFillTranslations = FindMatchingFillTranslationsOrDefault(poly.Color, colortranslations);
+//
+//            foreach (var colortranslation in matchingFillTranslations) 
+//            {
+//                IStepper s = new AngleStepper(poly, colortranslation);
+//
+//                var stepsOrig = s.CalculateFillSteps();
+//                var steps = stepsOrig.Select(p => new Step(p.Type, new Point(p.Point.X, p.Point.Y)));
+//                foreach (var item in steps)
+//                {
+//                    yield return new CsvStepWriter(item).Write();
+//                }
+//            }
+        }
 
-            var matchingFillTranslations = FindMatchingFillTranslationsOrDefault(poly.Color, colortranslations);
-
-            foreach (var colortranslation in matchingFillTranslations) 
-            {
-                IStepper s = new AngleStepper(poly, colortranslation);
-
-                var stepsOrig = s.CalculateFillSteps();
-                var steps = stepsOrig.Select(p => new Step(p.Type, new Point(p.Point.X, p.Point.Y)));
-                foreach (var item in steps)
-                {
-                    yield return new CsvStepWriter(item).Write();
-                }
-            }
+        static IEnumerable<ColorTranslation> FindMatchingTranslationsOrDefault(string color, string stroke, List<ColorTranslation> colortranslations)
+        {
+            return colortranslations.Where(ct => ct.Color == color || ct.Color == stroke);
         }
 
         static IEnumerable<ColorTranslation> FindMatchingFillTranslationsOrDefault(string color, List<ColorTranslation> colortranslations)

@@ -11,6 +11,7 @@ namespace SvgToEmbCSVTests
     public class StepWriterTests
     {
         string color = "#aabbcc";
+        string stroke = "stroke:#aabbcc";
         string otherColor = "#aabbdd";
 
         [Test()]
@@ -42,11 +43,35 @@ namespace SvgToEmbCSVTests
             Assert.IsTrue(stitchesSingle.Count() * 2 - 1 > stitchesDouble.Count() );
         }
 
+        [Test()]
+        public void FillBorderOrderIsMaintained()
+        {
+            var polygons = new List<Polygon> { this.createDefaultPolygon()};
+            List<ColorTranslation> ctForward = this.createColorAndStrokeTranslation();
+            List<ColorTranslation> ctBackward = this.createColorAndStrokeTranslation();
+            ctBackward.Reverse();
+
+            var stitchesForward = StepWriter.WriteStitches(ctForward, polygons);
+            var stitchesBackward = StepWriter.WriteStitches(ctBackward, polygons);
+
+            Assert.AreNotEqual(stitchesForward.Skip(1).First(), stitchesBackward.Skip(1).First());
+        }
+
         List<ColorTranslation> createSingleColorTranslation()
         {
             return new List<ColorTranslation> 
             {
-                new ColorTranslation { Color = this.color}
+                new ColorTranslation { Color = this.color},
+                new ColorTranslation { Color = this.otherColor},
+            };
+        }
+
+        List<ColorTranslation> createColorAndStrokeTranslation()
+        {
+            return new List<ColorTranslation> 
+            {
+                new ColorTranslation { Color = this.color},
+                new ColorTranslation { Color = this.stroke}
             };
         }
 
@@ -56,6 +81,7 @@ namespace SvgToEmbCSVTests
             {
                 new ColorTranslation { Color = this.color},
                 new ColorTranslation { Color = this.color},
+                new ColorTranslation { Color = this.otherColor},
             };
         }
 
@@ -81,7 +107,8 @@ namespace SvgToEmbCSVTests
                 new Point(1, 1),
                 new Point(1, 0),
             },
-                this.color
+                this.color,
+                this.stroke
             );
         }
     }
