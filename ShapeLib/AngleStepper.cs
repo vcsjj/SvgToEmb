@@ -44,7 +44,7 @@ namespace ShapeLib
                 rList.Add(rotated);
             }
 
-            Polygon p2 = new Polygon(rList);
+            Polygon p2 = new Polygon(rList, this.p.Color, this.p.Stroke, false);
             return p2;
         }
 

@@ -25,11 +25,13 @@ namespace ShapeLib
 			}
 		}
 
-        public Polygon(IEnumerable<Point> points, string color = "", string stroke = "")
+        public Polygon(IEnumerable<Point> points, string color = "", string stroke = "", bool autoOrient = true)
 		{
             this.Color = color;
             this.Stroke = stroke;
-            this.vertices = this.moveTopLeftToFirstIndex(points.ToList());
+            var list = points.ToList();
+
+            this.vertices = autoOrient ? MoveTopLeftToFirstIndex(list) : list;
 		}
 
         public Point CenterOfMass()
@@ -65,7 +67,7 @@ namespace ShapeLib
                 scaledVertices.Add(new Point(newX, newY));
             }
 
-            return new Polygon(scaledVertices);
+            return new Polygon(scaledVertices, this.Color, this.Stroke, false);
         }
 
         public BoundingBox GetBoundingBox()
@@ -78,7 +80,7 @@ namespace ShapeLib
             return new BoundingBox(minX, minY, maxX - minX, maxY - minY);
         }
 
-        private List<Point> moveTopLeftToFirstIndex(List<Point> points)
+        private static List<Point> MoveTopLeftToFirstIndex(List<Point> points)
         {
             int tli = VertexSorter.GetTopLeftIndex(points);
             if (tli == 0)

@@ -44,6 +44,16 @@ namespace ShapeLib
 			return Math.Sqrt(Math.Pow(this.X-p2.X, 2) + Math.Pow(this.Y-p2.Y, 2));
 		}
 
+        public double Angle(Point p2)
+        {
+            return Math.Atan2(p2.Y - this.Y, p2.X - this.X) / Math.PI * 180;
+        }
+
+        public double Length()
+        {
+            return this.Distance(new Point(0, 0));
+        }
+
         public Point Rotate(double degrees) 
         {
             var rad = degrees * Math.PI / 180;

@@ -94,87 +94,7 @@ namespace SvgToEmbCSVTests
             Assert.AreEqual(5, steps.Count);
         }
 
-        [Test()]
-        public void FindValidIntersectionTest()
-        {
-            Point p1, p2;
-            CreateLinePoints(out p1, out p2);
-            var intersection = HorizontalStepper.FindIntersection(p1, p2, 0);
-
-            Assert.AreEqual(0, intersection.Y);
-            Assert.AreEqual(2, intersection.X);
-        }
-
-        [Test()]
-        public void FindLowerPointIntersectionTest()
-        {
-            Point p1, p2;
-            CreateLinePoints(out p1, out p2);
-            var intersection = HorizontalStepper.FindIntersection(p1, p2, -4);
-
-            Assert.IsNotNull(intersection);
-        }
-
-        [Test()]
-        public void FindUpperPointIntersectionTest()
-        {
-            Point p1, p2;
-            CreateLinePoints(out p1, out p2);
-            var intersection = HorizontalStepper.FindIntersection(p1, p2, 4);
-
-            Assert.IsNotNull(intersection);
-        }
-
-        [Test()]
-        public void FindInvalidPointIntersectionReturnsNullTest([Values(-5, 5, double.PositiveInfinity, double.NegativeInfinity, double.NaN)]double d)
-        {
-            Point p1, p2;
-            CreateLinePoints(out p1, out p2);
-            var intersection = HorizontalStepper.FindIntersection(p1, p2, d);
-
-            Assert.IsNull(intersection);
-        }
-
-        [Test()]
-        public void FindIntersectionsOrderIsMaintained()
-        {
-            var p = this.createTriangle();
-            var intersection = HorizontalStepper.FindIntersections(0.1, p);
-            var first = intersection[0];
-            var second = intersection[1];
-            Assert.IsTrue(first.X <= second.X);
-        }
-
-        [Test()]
-        public void FindIntersectionsOrderIsMaintained2()
-        {
-            var p = this.createInverseTriangle();
-            var intersection = HorizontalStepper.FindIntersections(-0.1, p);
-            var first = intersection[0];
-            var second = intersection[1];
-            Assert.IsTrue(first.X <= second.X);
-        }
-
-        [Test()]
-        public void FindIntersectionsOrderIsMaintained3()
-        {
-            var p = this.createInverseTriangleOrder2();
-            var intersection = HorizontalStepper.FindIntersections(-0.1, p);
-            var first = intersection[0];
-            var second = intersection[1];
-            Assert.IsTrue(first.X <= second.X);
-        }
-
-        [Test()]
-        public void FindIntersectionsOrderIsMaintained4()
-        {
-            var p = this.createInverseTriangleOrder3();
-            var intersection = HorizontalStepper.FindIntersections(-0.1, p);
-            var first = intersection[0];
-            var second = intersection[1];
-            Assert.IsTrue(first.X <= second.X);
-        }
-
+      
 
 
         [Test()]
@@ -203,11 +123,7 @@ namespace SvgToEmbCSVTests
             Assert.IsTrue(outlineSteps.Count > this.polygon.Vertices.Count + 1);
         }
 
-        private static void CreateLinePoints(out Point p1, out Point p2)
-        {
-            p1 = new Point(1, -4);
-            p2 = new Point(3, 4);
-        }
+
 
 
 

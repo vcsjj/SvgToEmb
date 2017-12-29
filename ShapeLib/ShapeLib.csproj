@@ -46,6 +46,9 @@
     <Compile Include="StepLengthTransformer.cs" />
     <Compile Include="VertexSorter.cs" />
     <Compile Include="Stepper.cs" />
+    <Compile Include="LineWidener.cs" />
+    <Compile Include="OutlineCalculator.cs" />
+    <Compile Include="FillCalculator.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

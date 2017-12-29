@@ -53,6 +53,8 @@
     <Compile Include="StepperTestsBase.cs" />
     <Compile Include="StepLengthTransformerTests.cs" />
     <Compile Include="VertexSorterTests.cs" />
+    <Compile Include="LineWidenerTests.cs" />
+    <Compile Include="FillCalculatorTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

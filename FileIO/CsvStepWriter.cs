@@ -24,7 +24,7 @@ namespace FileIO
             switch (this.step.Type)
             {
                 case Step.StepType.Jump:
-                    typestring = "JUMP";
+                    typestring = "TRIM";
                     break;
 
                 case Step.StepType.Stitch:
