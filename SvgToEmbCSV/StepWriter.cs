@@ -11,12 +11,8 @@ namespace SvgToEmbCSV
         public static IEnumerable<string> WriteStitches(List<ColorTranslation> colortranslations, List<Polygon> polygonList)
         {
             foreach (var poly in polygonList)
-            {
                 foreach (string s in WriteStitchesForOnePolygonWithTranslations(colortranslations)(poly))
-                {
                     yield return s;
-                }
-            }
 
             yield return CsvStepWriter.WriteClosingSequence();
         }
@@ -25,21 +21,25 @@ namespace SvgToEmbCSV
         => poly 
         => WriteStitchesForOnePolygon(poly, colortranslations);
 
-        private static IEnumerable<string> WriteStitchesForOnePolygon(Polygon poly, List<ColorTranslation> colortranslations)
+        private static List<string> WriteStitchesForOnePolygon(Polygon poly, List<ColorTranslation> colortranslations)
         {
             var matchingTranslations = FindMatchingTranslationsOrDefault(poly.Color, poly.Stroke, colortranslations);
-            foreach (var colortranslation in matchingTranslations) 
-            {
-                IStepper s = new AngleStepper(poly, colortranslation);
-
-                var stepsOrig = colortranslation.Color.StartsWith("stroke") ? s.CalculateOutlineSteps() : s.CalculateFillSteps();
-                var steps = stepsOrig.Select(p => new Step(p.Type, new Point(p.Point.X, p.Point.Y)));
-                foreach (var item in steps)
-                {
-                    yield return new CsvStepWriter(item).Write();
-                }
-            }
+            var allsteps = matchingTranslations
+                .SelectMany(colortranslation => CreateStepsForOneColorTranslation(new AngleStepper(poly, colortranslation), colortranslation.IsStroke()))
+                .ToList();
+            
+            Stepper.ChangeFirstStepToJump(allsteps);
+            return allsteps
+                .Select(step => new CsvStepWriter(step).Write())
+                .ToList();
         }
+
+        static List<Step> CreateStepsForOneColorTranslation(IStepper s, bool isStroke) =>
+            (isStroke
+                ? s.CalculateOutlineSteps() 
+                : s.CalculateFillSteps())
+                    .Select(p => new Step(p.Type, new Point(p.Point.X, p.Point.Y)))
+                    .ToList();
 
         static IEnumerable<ColorTranslation> FindMatchingTranslationsOrDefault(string color, string stroke, List<ColorTranslation> colortranslations)
         {

@@ -55,7 +55,7 @@ namespace SvgToEmbCSV
 
             colortranslations = colortranslations.Count == 0 ? defaultMap : colortranslations;
 
-            var polygonList = new SvgReader(r).ExtractPolygons();
+            var polygonList = new SvgReader(r).ExtractPolygons().ToList();
 
             var steps = StepWriter.WriteStitches(colortranslations, polygonList);
             foreach (var step in steps)

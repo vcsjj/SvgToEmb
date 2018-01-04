@@ -14,13 +14,16 @@ namespace FileIO
 
         public const string FillIdentifier = "fill";
         public const string StrokeIdentifier = "stroke";
+
+        private static System.Globalization.CultureInfo culture = System.Globalization.CultureInfo.InvariantCulture;
+        private static System.Globalization.NumberStyles numberStyle = System.Globalization.NumberStyles.Any;
       
         public SvgReader(System.Xml.Linq.XElement xElement)
         {
             this.source = xElement;
         }
 
-        public List<Polygon> ExtractPolygons()
+        public IEnumerable<Polygon> ExtractPolygons()
         {
             return this.ExtractPolygons(this.source.Elements());
         }
@@ -33,70 +36,45 @@ namespace FileIO
         private List<SvgObjectProperty> ReadObjectProperties(IEnumerable<XElement> elements)
         {
             var lc = new List<SvgObjectProperty>();
-            foreach (XElement l1 in elements)
+            foreach (XElement xelement in elements)
             {
-                if (l1.Name.LocalName == "polygon")
+                if (IsPolygon(xelement))
                 {
-                    lc.AddRange(AddDescriptionIfAny(l1, SvgPropertyType.Fill, FillIdentifier).Where(x => !lc.Contains(x)));
-                    lc.AddRange(AddDescriptionIfAny(l1, SvgPropertyType.Stroke, StrokeIdentifier).Where(x => !lc.Contains(x)));
+                    lc.AddRange(ExtractDescription(xelement, SvgPropertyType.Fill, FillIdentifier).Where(x => !lc.Contains(x)));
+                    lc.AddRange(ExtractDescription(xelement, SvgPropertyType.Stroke, StrokeIdentifier).Where(x => !lc.Contains(x)));
                 }
                 else
                 {
-                    lc.AddRange(this.ReadObjectProperties(l1.Elements()));
+                    lc.AddRange(this.ReadObjectProperties(xelement.Elements()));
                 }
             }
 
             return lc;
         }
 
-        List<SvgObjectProperty> AddDescriptionIfAny(XElement l1, SvgPropertyType type, string identifier)
-        {
-            var list = new List<SvgObjectProperty>();
-            var p = ExtractDescription(l1, type, identifier);
-            if (p != null)
-            {
-                list.Add(p);
-            }
+        private static bool IsPolygon(XElement p) => p.Name.LocalName == "polygon";
 
-            return list;
+        private IEnumerable<Polygon> ExtractPolygons(IEnumerable<XElement> elements)
+        {
+            return elements.SelectMany(xelement => IsPolygon(xelement)
+                ? ExtractPolygon(xelement)
+                : this.ExtractPolygons(xelement.Elements()));
         }
 
-        List<Polygon> ExtractPolygons(IEnumerable<XElement> elements)
+        IEnumerable<SvgObjectProperty> ExtractDescription(XElement xelement, SvgPropertyType type, string identifier)
         {
-
-            var lp = new List<Polygon>();
-            foreach (var l1 in elements)
-            {
-                if (l1.Name.LocalName == "polygon")
-                {
-                    var p = ExtractPolygon(l1);
-                    if (p != null)
-                    {
-                        lp.Add(p);
-                    }
-                }
-                else
-                {
-                    lp.AddRange(this.ExtractPolygons(l1.Elements()));
-                }
-            }
-
-            return lp;
-        }
-
-        SvgObjectProperty ExtractDescription(XElement l1, SvgPropertyType type, string identifier)
-        {
-            string styleString = l1.Attribute("style")?.Value;
+            List<SvgObjectProperty> description = new List<SvgObjectProperty>();
+            string styleString = xelement.Attribute("style")?.Value;
             if (styleString != null)
             {
-                return new SvgObjectProperty
+                description.Add(new SvgObjectProperty
                 { 
                     Color = styleString.Split(';').Where(s => s.StartsWith(identifier)).DefaultIfEmpty(string.Empty).First(),
                     Type = type
-                };
+                });
             }
 
-            return null;
+            return description;
         }
 
         static string ColorFromStyle(string styleString) => styleString?.Split(';')
@@ -111,48 +89,45 @@ namespace FileIO
                 .StartsWith(StrokeIdentifier + ":"))
             ?? defaultStroke;
 
-        Polygon ExtractPolygon(XElement l1)
+        IEnumerable<Polygon> ExtractPolygon(XElement xelement)
         {
-            var culture = System.Globalization.CultureInfo.InvariantCulture;
-            var numberStyle = System.Globalization.NumberStyles.Any;
-            Polygon ret = null;
-            string pointsString = l1.Attribute("points")?.Value;
-            string styleString = l1.Attribute("style")?.Value;
-            string transformationString = l1.Attribute("transform")?.Value;
+            List<Polygon> ret = new List<Polygon>();
+            string pointsString = xelement.Attribute("points")?.Value;
+            string styleString = xelement.Attribute("style")?.Value;
+            string transformationString = xelement.Attribute("transform")?.Value;
 
             string color = ColorFromStyle(styleString);
             string stroke = StrokeFromStyle(styleString);
-            
-            double[] transformation = new double[] {
-                1,
-                0,
-                0,
-                1,
-                0,
-                0
-            };
-            if (!string.IsNullOrEmpty(transformationString))
-            {
-                transformation = new TransformationParser(transformationString).GetTransformation();
-            }
+
+            var transformation = new TransformationParser(transformationString).GetTransformation();
+
             if (!string.IsNullOrEmpty(pointsString))
             {
-                string[] positionList = pointsString.Split(' ');
-                List<Point> l = new List<Point>();
-                foreach (string position in positionList)
-                {
-                    string[] xy = position.Split(',');
-                    double x = 0.0;
-                    double y = 0.0;
-                    if (double.TryParse(xy[0], numberStyle, culture, out x) && double.TryParse(xy[1], numberStyle, culture, out y))
-                    {
-                        l.Add(new Point(x, y, transformation));
-                    }
-                }
-                ret = new Polygon(l, color, stroke);
+                var points = pointsString
+                    .Split(' ')
+                    .Select(position => position.Split(','))
+                    .SelectMany(positionParts => AddPoint(positionParts, transformation))
+                    .ToList();
+                
+                ret.Add(new Polygon(points, color, stroke));
             }
 
             return ret;
+        }
+
+        static List<Point> AddPoint(string [] xy, double[] transformation)
+        {
+            List<Point> l = new List<Point>();
+
+            double x = 0.0;
+            double y = 0.0;
+
+            if (double.TryParse(xy[0], numberStyle, culture, out x) && double.TryParse(xy[1], numberStyle, culture, out y))
+            {
+                l.Add(new Point(x, y, transformation));
+            }
+
+            return l;
         }
     }
 }

@@ -8,7 +8,6 @@ namespace ShapeLib
     {
         private readonly Polygon polygon;
         private readonly ColorTranslation ct;
-        private bool hasOutline = false;
 
         public HorizontalStepper(Polygon p, ColorTranslation ct)
         {
@@ -18,14 +17,13 @@ namespace ShapeLib
 
         public override List<Step> CalculateFillSteps()
         {
-            FillCalculator fc = new FillCalculator(this.polygon, this.ct, this.hasOutline);
+            FillCalculator fc = new FillCalculator(this.polygon, this.ct);
             return fc.Calculate();
 
         }
 
         public override List<Step> CalculateOutlineSteps()
         {
-            this.hasOutline = true;
             OutlineCalculator oc = new OutlineCalculator(this.polygon, this.ct);
             return oc.Calculate();
         }

@@ -109,6 +109,11 @@ namespace ShapeLib
                 return false;
             }
         }
+
+        public override int GetHashCode()
+        {
+            return this.X.GetHashCode() + this.Y.GetHashCode();
+        }
 	}
 }
 

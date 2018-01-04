@@ -8,6 +8,36 @@ namespace SvgToEmbCSVTests
     public class TransformationParserTests
     {
         [Test()]
+        public void EmptyStringIsParsedAsNoTransformation()
+        {
+            TransformationParser tp = new TransformationParser(string.Empty);
+            double[] tr = tp.GetTransformation();
+
+            Assert.AreEqual(1, tr[0]);
+            Assert.AreEqual(1, tr[3]);
+
+            Assert.AreEqual(0, tr[1]);
+            Assert.AreEqual(0, tr[2]);
+            Assert.AreEqual(0, tr[4]);
+            Assert.AreEqual(0, tr[5]);
+        }
+
+        [Test()]
+        public void NullIsParsedAsNoTransformation()
+        {
+            TransformationParser tp = new TransformationParser(null);
+            double[] tr = tp.GetTransformation();
+
+            Assert.AreEqual(1, tr[0]);
+            Assert.AreEqual(1, tr[3]);
+
+            Assert.AreEqual(0, tr[1]);
+            Assert.AreEqual(0, tr[2]);
+            Assert.AreEqual(0, tr[4]);
+            Assert.AreEqual(0, tr[5]);
+        }
+
+        [Test()]
         public void Translate()
         {
             TransformationParser tp = new TransformationParser("translate(15, -34.8)");

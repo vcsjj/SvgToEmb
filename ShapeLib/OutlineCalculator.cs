@@ -25,7 +25,7 @@ namespace ShapeLib
                 .Select(vertex => new Step(Step.StepType.Stitch, vertex))
                 .ToList();
 
-                steps.Add(new Step(Step.StepType.Jump, reducedPolygon.Vertices[0]));
+                steps.Add(new Step(Step.StepType.Stitch, reducedPolygon.Vertices[0]));
                 return new StepLengthTransformer(steps, this.colorTranslation.MaxStepLength).AddInbetweenStitches();
             }
             else
@@ -36,13 +36,17 @@ namespace ShapeLib
                     var previous = reducedPolygon.Vertices[i - 1];
                     var current = reducedPolygon.Vertices[i];
 
-                    result.AddRange(AddStepsForOneLine(reducedPolygon, previous, current));
+                    var stepsForOneLine = AddStepsForOneLine(reducedPolygon, previous, current);
+                    result.AddRange(stepsForOneLine);
                 }
 
-                result.AddRange(AddStepsForOneLine(reducedPolygon, reducedPolygon.Vertices.Last(), reducedPolygon.Vertices.First()));
+                var stepsForClosingLine = AddStepsForOneLine(reducedPolygon, reducedPolygon.Vertices.Last(), reducedPolygon.Vertices.First());
+                result.AddRange(stepsForClosingLine);
                 return result;
             }
         }
+
+
 
         List<Step> AddStepsForOneLine(Polygon reducedPolygon, Point previous, Point current)
         {

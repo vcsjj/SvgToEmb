@@ -8,13 +8,11 @@ namespace ShapeLib
     {        
         private readonly Polygon polygon;
         private readonly ColorTranslation colorTranslation;
-        private readonly bool hasOutline;
 
-        public FillCalculator(Polygon polygon, ColorTranslation ct, bool hasOutline)
+        public FillCalculator(Polygon polygon, ColorTranslation ct)
         {
             this.polygon = polygon;
             this.colorTranslation = ct;
-            this.hasOutline = hasOutline;
         }
 
         public List<Step> Calculate()
@@ -23,12 +21,11 @@ namespace ShapeLib
             var l = new List<Step>();
             var firstVertex = polygon.Vertices[0];
             var bb = this.polygon.GetBoundingBox();
-            l.Add(new Step(this.hasOutline ? Step.StepType.Stitch : Step.StepType.Jump, firstVertex));
+            l.Add(new Step(Step.StepType.Stitch, firstVertex));
 
             for (double y = bb.Top - this.colorTranslation.LineHeight; y > bb.Bottom; y -= this.colorTranslation.LineHeight)
             {
-                List<Step> t = FindIntersections(y, polygon);
-                l.AddRange(t);
+                l.AddRange(FindIntersections(y, polygon));
             }
 
             return new StepLengthTransformer(l, this.colorTranslation.MaxStepLength).AddInbetweenStitches();
@@ -88,6 +85,5 @@ namespace ShapeLib
             return sortedByX;
         }
 	}
-
 }
 

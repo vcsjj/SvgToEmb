@@ -15,13 +15,12 @@ namespace ShapeLib
             return outline;
         }
 
-        public virtual List<Step> CalculateFillSteps()
+        public abstract List<Step> CalculateFillSteps();
+        public abstract List<Step> CalculateOutlineSteps();
+
+        public static void ChangeFirstStepToJump(List<Step> stepsForOneLine)
         {
-            throw new NotImplementedException();
-        }
-        public virtual List<Step> CalculateOutlineSteps()
-        {
-            throw new NotImplementedException();
+            stepsForOneLine[0] = new Step(Step.StepType.Jump, stepsForOneLine[0].Point);
         }
     }
 }

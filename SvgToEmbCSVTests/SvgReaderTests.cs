@@ -15,9 +15,9 @@ namespace SvgToEmbCSVTests
         public void EmptyElementHasZeroPolygons()
         {
             var reader = new SvgReader(new System.Xml.Linq.XElement("test"));
-            List<Polygon> lp = reader.ExtractPolygons();
+            IEnumerable<Polygon> lp = reader.ExtractPolygons();
 
-            Assert.AreEqual(0, lp.Count);
+            Assert.AreEqual(0, lp.Count());
         }
 
         [Test()]
@@ -27,9 +27,9 @@ namespace SvgToEmbCSVTests
                                  "  <svg><polygon\n     points=\"1088.95,2511.82 1169.85,2570.6 1138.95,2475.49 1058.05,2416.71 \"  transform=\"matrix(0.05880683,0,0,0.0624649,-51.602926,-159.78388)\" /></svg>"
                              ));
 
-            List<Polygon> lp = reader.ExtractPolygons();
+            IEnumerable<Polygon> lp = reader.ExtractPolygons();
 
-            Assert.AreEqual(1, lp.Count);
+            Assert.AreEqual(1, lp.Count());
         }
 
         [Test()]
@@ -39,7 +39,7 @@ namespace SvgToEmbCSVTests
                 "  <svg><polygon\n     points=\"1088.95,2511.82 1169.85,2570.6 1138.95,2475.49 1058.05,2416.71 \" /></svg>"
             ));
 
-            List<Polygon> lp = reader.ExtractPolygons();
+            IEnumerable<Polygon> lp = reader.ExtractPolygons();
 
             Assert.IsTrue(lp.Where(poly => poly.Vertices.Where(pt => Math.Abs(pt.X - 1058.05) < 1e-8 && Math.Abs(pt.Y - 2416.71) < 1e-8).Any()).Any());
         }
@@ -53,9 +53,9 @@ namespace SvgToEmbCSVTests
                 + "<polygon\n     points=\"1088.95,2511.82 1169.85,2570.6 1138.95,2475.49 1058.05,2416.71 \"/></svg>"
             ));
 
-            List<Polygon> lp = reader.ExtractPolygons();
+            IEnumerable<Polygon> lp = reader.ExtractPolygons();
 
-            Assert.AreEqual(2, lp.Count);
+            Assert.AreEqual(2, lp.Count());
         }
 
         [Test()]
@@ -70,9 +70,9 @@ namespace SvgToEmbCSVTests
                 + "</svg>"
             ));
 
-            List<Polygon> lp = reader.ExtractPolygons();
+            IEnumerable<Polygon> lp = reader.ExtractPolygons();
 
-            Assert.AreEqual(2, lp.Count);
+            Assert.AreEqual(2, lp.Count());
         }
 
         [Test()]
@@ -86,7 +86,7 @@ namespace SvgToEmbCSVTests
 
             var reader = new SvgReader(source);
 
-            List<Polygon> lp = reader.ExtractPolygons();
+            IEnumerable<Polygon> lp = reader.ExtractPolygons();
 
             Assert.AreEqual("fill:#aaaa00", lp.First().Color);
         }
@@ -102,7 +102,7 @@ namespace SvgToEmbCSVTests
 
             var reader = new SvgReader(source);
 
-            List<Polygon> lp = reader.ExtractPolygons();
+            IEnumerable<Polygon> lp = reader.ExtractPolygons();
 
             Assert.AreEqual("fill:#bcdaa0", lp.First().Color);
         }

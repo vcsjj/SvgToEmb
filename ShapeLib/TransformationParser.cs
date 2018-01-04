@@ -13,15 +13,17 @@ namespace ShapeLib
         Regex sevenNumbersExpression = new Regex("([0-9.e\\-]+), *([0-9.e\\-]+), *([0-9.e\\-]+), *([0-9.e\\-]+), *([0-9.e\\-]+), *([0-9.e\\-]+)");
 
         private readonly string transformationstring;
+        private static string noTransformation = "" ;
 
         public TransformationParser(string transform)
         {
-            this.transformationstring = transform;
+            this.transformationstring = transform ?? noTransformation;
         }
 
         double[,] GetUnitMatrix()
         {
-            return new double[,] {
+            return new double[,]
+            {
                 {
                     1,
                     0,
@@ -85,7 +87,7 @@ namespace ShapeLib
             if (match.Groups.Count == 7)
             {
                 double a, b, c, d, e, f;
-                if (double.TryParse(match.Groups[1].Value, numberStyle, culture, out a) 
+                if (double.TryParse(match.Groups[1].Value, numberStyle, culture, out a)
                     && double.TryParse(match.Groups[2].Value, numberStyle, culture, out b)
                     && double.TryParse(match.Groups[3].Value, numberStyle, culture, out c)
                     && double.TryParse(match.Groups[4].Value, numberStyle, culture, out d)
@@ -130,7 +132,7 @@ namespace ShapeLib
                 double s;
                 if (double.TryParse(match.Groups[1].Value, numberStyle, culture, out s))
                 {
-                    m[1, 0] = Math.Tan(Math.PI * s/ 180.0);
+                    m[1, 0] = Math.Tan(Math.PI * s / 180.0);
                 }
             }
 
@@ -146,21 +148,22 @@ namespace ShapeLib
                 double s;
                 if (double.TryParse(match.Groups[1].Value, numberStyle, culture, out s))
                 {
-                    m[0, 1] = Math.Tan(Math.PI * s/ 180.0);
+                    m[0, 1] = Math.Tan(Math.PI * s / 180.0);
                 }
             }
 
             return m;
         }
 
-        public double[] GetTransformation() 
+        public double[] GetTransformation()
         {
             Regex transformationsRegex = new Regex("(translate|rotate|matrix|scale|skewX|skewY)\\((.*?)\\)");
             var mc = transformationsRegex.Matches(this.transformationstring);
             var m0 = GetUnitMatrix();
 
-            foreach (Match match in mc){
-                double [,] m;
+            foreach (Match match in mc)
+            {
+                double[,] m;
                 var numbers = match.Groups[2].Value;
                 switch (match.Groups[1].Value)
                 {
@@ -190,16 +193,18 @@ namespace ShapeLib
                 m0 = Multiply(m0, m);
             }
 
-            return new double[] {
-                m0[0,0],
-                m0[0,1],
-                m0[1,0],
-                m0[1,1],
-                m0[2,0],
-                m0[2,1]};
+            return new double[]
+            {
+                m0[0, 0],
+                m0[0, 1],
+                m0[1, 0],
+                m0[1, 1],
+                m0[2, 0],
+                m0[2, 1]
+            };
         }
 
-        double[,] Multiply(double[,] A, double[,] B) 
+        double[,] Multiply(double[,] A, double[,] B)
         {
             int rA = A.GetLength(0);
             int cA = A.GetLength(1);
