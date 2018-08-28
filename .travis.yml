@@ -4,5 +4,5 @@ solution: SvgToEmbCSV.sln
 install:
   - nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
 script:
-  - msbuild /p:Configuration=Release solution-name.sln
+  - msbuild /p:Configuration=Release SvgToEmbCSV.sln
   - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./SvgToEmbCSVTests/bin/Release/svgToEmbCSVTests.dll
